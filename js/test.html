@@ -1,0 +1,21 @@
+<script type="text/javascript">
+    function Player() {
+        this.name;
+        this.hitpoints = 100;
+        this.attack = function attack(opponent) {
+            opponent.hitpoints -= 10;
+
+            alert(this.name + " just hit " + opponent.name );
+        }
+    }
+
+    var p1 = new Player();
+    var p2 = new Player();
+
+    p1.name = "Conan";
+    p2.name = "Hercules";
+
+    p1.attack(p2);
+
+    alert(p2.name + " has " + p2.hitpoints + "  hit points left");
+</script>
