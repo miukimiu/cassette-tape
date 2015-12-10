@@ -1,21 +1,21 @@
 # cassette-player
 
-Cassete player is a music player created with SVG and manipulated with snap.svg and javascript.
+Cassete player is a html 5 music player created with SVG and manipulated with snap.svg and javascript.
 
-You can design any svg player and you just need to give them the rights IDs. The javacript will find all the ID and manipulate them.
+You can design any svg player and you just need to give the right IDs. The javacript will find all the IDs and manipulate them.
 
 These are the available player controls and IDs:
 
-* #play - your play button should haves this id
-* #forward - your forward button should haves this id
-* #backward - your backward button should haves this id
-* #rec - your rec button should haves this id
+* #play - your play button should have this id
+* #forward - your forward button should have this id
+* #backward - your backward button should have this id
+* #rec - your rec button should have this id
 
 This project is in development. So, it means is not working properly.
 
 ### Install gulp and Bower
 
-Building the theme requires [node.js](http://nodejs.org/download/). We recommend you update to the latest version of npm: `npm install -g npm@latest`.
+Building the player requires [node.js](http://nodejs.org/download/)
 
 From the command line:
 
