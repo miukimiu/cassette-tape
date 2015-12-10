@@ -35,7 +35,7 @@ gulp.task('build-css', function() {
     .pipe(gulp.dest(output.stylesheets));
 });
 
-
+/* copy html files  */
 gulp.task('build-html', function(){
     return gulp.src(input.html)
         .pipe(gulp.dest(output.html));
