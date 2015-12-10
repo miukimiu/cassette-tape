@@ -8,7 +8,7 @@ var gulp  = require('gulp'),
 
     input  = {
       'sass': 'source/scss/**/*.scss',
-      'javascript': 'source/javascript/**/*.js',
+      'javascript': 'source/javascript/*.js',
       'vendorjs': 'build/assets/javascript/vendor/**/*.js',
       'html': 'source/*.html'
     },
@@ -45,7 +45,7 @@ gulp.task('build-html', function(){
 gulp.task('build-js', function() {
   return gulp.src(input.javascript)
     .pipe(sourcemaps.init())
-      .pipe(concat('bundle.js'))
+      .pipe(concat('main.js'))
       //only uglify if gulp is ran with '--type production'
       .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop()) 
     .pipe(sourcemaps.write())

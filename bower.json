@@ -1,0 +1,20 @@
+{
+  "name": "cassette-player",
+  "version": "0.0.1",
+  "homepage": "https://github.com/miukimiu/cassette-player",
+  "authors": [
+    "Miuki Miu <mail@miukimiu.com>"
+  ],
+  "description": "Just a svg music player",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Snap.svg": "snap.svg#~0.4.1"
+  }
+}
