@@ -1,6 +1,7 @@
 var gulp  = require('gulp'),
-    gutil = require('gulp-util')
-    browserSync = require('browser-sync').create()
+    gutil = require('gulp-util'),
+    browserSync = require('browser-sync').create(),
+    ghPages = require('gulp-gh-pages')
 
     jshint     = require('gulp-jshint'),
     concat     = require('gulp-concat'),
@@ -50,6 +51,12 @@ gulp.task('build-js', function() {
       .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop()) 
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(output.javascript));
+});
+
+// deploy
+gulp.task('deploy', function() {
+  return gulp.src('build/**/*')
+    .pipe(ghPages());
 });
 
 // Static server
