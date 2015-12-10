@@ -25,5 +25,8 @@
     "gulp-sourcemaps": "~1.3.0",
     "gulp-util": "~3.0.2",
     "jshint-stylish": "~1.0.0"
+  },
+  "dependencies": {
+    "gulp": "^3.9.0"
   }
 }
