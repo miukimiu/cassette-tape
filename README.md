@@ -2,9 +2,9 @@
 
 Cassete player is a music player created with SVG and manipulated with snap.svg and javascript.
 
-You can create any player with svg and you just need to give them the rights ID. The javacript will find the ID and control it.
+You can design any svg player and you just need to give them the rights IDs. The javacript will find all the ID and manipulate them.
 
-There are the available player controls and IDs:
+These are the available player controls and IDs:
 
 * #play - your play button should haves this id
 * #forward - your forward button should haves this id
