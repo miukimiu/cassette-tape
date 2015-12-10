@@ -1,8 +1,8 @@
 var gulp  = require('gulp'),
     gutil = require('gulp-util'),
     browserSync = require('browser-sync').create(),
-    ghPages = require('gulp-gh-pages')
-
+    ghPages = require('gulp-gh-pages'),
+    sass = require('gulp-sass'),
     jshint     = require('gulp-jshint'),
     concat     = require('gulp-concat'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -31,7 +31,7 @@ gulp.task('jshint', function() {
 gulp.task('build-css', function() {
   return gulp.src('source/scss/**/*.scss')
     .pipe(sourcemaps.init())
-      .pipe(sass())
+    .pipe(sass().on('error', sass.logError))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(output.stylesheets));
 });
