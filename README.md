@@ -26,3 +26,4 @@ From the command line:
 ### Available gulp commands
 
 * `gulp` — Compile and optimize the files in your assets directory and watch
+* `gulp deploy` — Deploy build folder to gh-pages
