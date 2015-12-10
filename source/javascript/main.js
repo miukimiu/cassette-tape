@@ -15,6 +15,7 @@
 			buttonYpositionActive = 8.679477,
 			bboxL = tapeL.getBBox();
 			bboxR = tapeR.getBBox();
+			song = new Audio('audio/miukimiu-paro_quando_quiser_parar.mp3');
 
 			// wheel animation left
 			function wheelAnimationL() {
@@ -208,6 +209,10 @@
 
 					xPlay = true;
 
+					song.play();
+
+					console.log(song.play());
+
 				}  else {
 
 				  playStop();
@@ -236,3 +241,5 @@
 				}
 			});
 			// end forward function
+
+			var myaudio = new Audio('mysong.mp3');

@@ -11,13 +11,15 @@ var gulp  = require('gulp'),
       'sass': 'source/scss/**/*.scss',
       'javascript': 'source/javascript/*.js',
       'vendorjs': 'build/assets/javascript/vendor/**/*.js',
-      'html': 'source/*.html'
+      'html': 'source/*.html',
+      'audio': 'source/audio/*.mp3'
     },
 
     output = {
       'stylesheets': 'build/assets/stylesheets',
       'javascript': 'build/assets/javascript',
-      'html': 'build'
+      'html': 'build',
+      'audio': 'build/audio'
     };
 
 /* run javascript through jshint */
@@ -40,6 +42,12 @@ gulp.task('build-css', function() {
 gulp.task('build-html', function(){
     return gulp.src(input.html)
         .pipe(gulp.dest(output.html));
+});
+
+/* copy html files  */
+gulp.task('build-audio', function(){
+    return gulp.src(input.audio)
+        .pipe(gulp.dest(output.audio));
 });
 
 /* concat javascript files, minify if --type production */
