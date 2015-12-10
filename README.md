@@ -1,4 +1,4 @@
-# cassette-player
+# Cassette Player
 
 Cassete player is a html 5 music player created with SVG and manipulated with snap.svg and javascript.
 
