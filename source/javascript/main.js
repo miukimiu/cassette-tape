@@ -13,9 +13,15 @@
 			tapeR = Snap('#tapeR'),
 			buttonYposition = 0.679477,
 			buttonYpositionActive = 8.679477,
-			bboxL = tapeL.getBBox();
-			bboxR = tapeR.getBBox();
-			song = new Audio('audio/miukimiu-paro_quando_quiser_parar.mp3');
+			bboxL = tapeL.getBBox(),
+			bboxR = tapeR.getBBox(),
+			audio = new Audio(),
+			duration = audio.duration,
+			playlist = new Array('audio/cesaria.mp3', 'audio/no_trends.mp3', 'audio/you_got_me.mp3'),
+			currentTrack = 0;
+
+			console.log('the current track is: ' + currentTrack);
+
 
 			// wheel animation left
 			function wheelAnimationL() {
@@ -186,9 +192,29 @@
 
 					xBackward = true;
 
+					if(currentTrack > 0 ) {
+
+						currentTrack--;
+
+
+						console.log('bw - the current track is: ' + currentTrack);
+
+					} else {
+					    currentTrack = (playlist.length - 1);
+
+					    console.log('bw - the current track is: ' + currentTrack);
+					}
+
+					audio.src = playlist[currentTrack];
+
+
+	   	 			audio.play();
+
+
 				}  else {
 
-					backwardStop()
+					backwardStop();
+
 
 				}
 			});
@@ -197,7 +223,7 @@
 			// play function
 			play.click(function() {
 			 	
-			 	if (!xPlay){
+			 	if (!xPlay){ // is stopped or paused
 
 			 		recStop();
 					backwardStop();
@@ -209,13 +235,17 @@
 
 					xPlay = true;
 
-					song.play();
+					audio.src = playlist[currentTrack];
 
-					console.log(song.play());
+					console.log(playlist[currentTrack]);
 
-				}  else {
+	   	 			audio.play();
 
-				  playStop();
+				}  else { // if is playing
+					audio.pause();
+				  	playStop();
+
+				  	console.log('play - the current track is: ' + currentTrack);
 				}
 			});
 			// end play function
@@ -234,6 +264,21 @@
 			 		wheelAnimationForward();
 
 					XForward = true;
+
+					if(currentTrack == (playlist.length - 1)){
+						currentTrack = 0;
+					} else {
+					    currentTrack++;	
+					}
+
+					audio.src = playlist[currentTrack];
+
+					console.log(playlist[currentTrack]);
+
+	   	 			audio.play();
+
+	   	 			console.log('fw - the current track is: ' + currentTrack);
+
 				}  else {
 
 					forwardStop();
@@ -242,4 +287,5 @@
 			});
 			// end forward function
 
-			var myaudio = new Audio('mysong.mp3');
+			
+
