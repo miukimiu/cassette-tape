@@ -225,7 +225,12 @@
 	   	 			audio.play();
 
 
-				}  
+				}  else {
+
+					backwardStop();
+
+
+				}
 			});
 			// end backward function
 
@@ -299,7 +304,11 @@
 
 	   	 			console.log('fw - the current track is: ' + currentTrack);
 
-				}  
+				}  else {
+
+					forwardStop();
+
+				}
 			});
 			// end forward function
 
