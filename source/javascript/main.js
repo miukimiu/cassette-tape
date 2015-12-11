@@ -2,11 +2,9 @@
 		var rec = Snap('#rec'),
 			xRec = false,
 			backward = Snap('#backward'),
-			xBackward = false,
 			play = Snap('#play'),
 			xPlay = false,
 			forward = Snap('#forward'),
-			XForward = false,
 			wheelL = Snap('#wheel-l'),
 			wheelR = Snap('#wheel-r'),
 			tapeL = Snap('#tapeL'),
@@ -48,54 +46,7 @@
 				wheelAnimationR();
 				wheelAnimationL();
 			}
-			// wheel speed animation left
-			function wheelAnimationForwardL() {
-				wheelL.stop().animate({ transform: 'r360,30,30'}
-					, 1000,
-					function(){ 
-							wheelL.attr({ transform: 'rotate(0 30 30)'});
-							wheelAnimationForwardL();
-						}
-				);
-			}
-			// wheel speed animation right
-			function wheelAnimationForwardR() {
-				wheelR.stop().animate({ transform: 'r360,270,30'}
-					, 1000,
-					function(){ 
-							wheelR.attr({ transform: 'rotate(0 270 30)'});
-							wheelAnimationForwardR();
-						}
-				);
-			}
-			function wheelAnimationForward() {
-				wheelAnimationForwardL();
-				wheelAnimationForwardR();
-			}
-			// left wheel animation backward
-			function wheelAnimationBackwardL() {
-				wheelL.stop().animate({ transform: 'r-360,30,30'}
-					, 1000,
-					function(){ 
-							wheelL.attr({ transform: 'rotate(0 30 30)'});
-							wheelAnimationBackwardL();
-						}
-				);
-			}
-			// right wheel animation backward
-			function wheelAnimationBackwardR() {
-				wheelR.stop().animate({ transform: 'r-360,270,30'}
-					, 1000,
-					function(){ 
-							wheelR.attr({ transform: 'rotate(0 270 30)'});
-							wheelAnimationBackwardR();
-						}
-				);
-			}
-			function wheelAnimationBackward() {
-				wheelAnimationBackwardL();
-				wheelAnimationBackwardR();
-			}
+			
 			function stopAnimation() {
 				wheelL.stop();
 				wheelR.stop();
@@ -128,31 +79,6 @@
 			function tapeAnimationPlay() {
 				//translate(44.709110, 0.680291)
 				tape.animate( { 'transform' : 't84.709110, 0.680291' }, 14000);
-			}
-			function tapeAnimationForward() {
-				//translate(44.709110, 0.680291)
-				//tape.animate( { 'transform' : 't' + bbox.x + ', 0.680291' }, 3000);
-				//tapeL 90.38925099999999
-				//tapeR 330.389251
-				tapeL.animate({ cx: bboxL.cx }, 2000, mina.bounce, 
-				function() { tapeL.animate({ cx: 110 }, 2000) });
-
-				tapeR.animate({ cx: bboxR.cx }, 2000, mina.bounce, 
-				function() { tapeR.animate({ cx: 360 }, 2000) });
-			}
-			
-			console.log('left: ' + bboxL.cx);
-			console.log('right: ' + bboxR.cx);
-			
-			tapeAnimationForward();
-
-			function setWheelAnimation( speed, mode ) {
-				if( mode === 'play' || mode === 'forward' || mode === 'rec') {
-					anim = 'rotateLeft';
-				}
-				else if( mode === 'backward' ) {
-					anim = 'rotateRight';
-				}
 			}
 			
 			// rec function
@@ -191,11 +117,7 @@
 				}
 
 				anim1();
-				
-				wheelAnimationBackward();
-
-				xBackward = true;
-
+			
 				if(currentTrack > 0 ) {
 
 					currentTrack--;
@@ -215,7 +137,7 @@
 				if (xPlay) { // if is playing
 					audio.play();
 				}
-				
+
 			});
 			// end backward function
 
@@ -262,10 +184,6 @@
 				}
 
 				anim1();
-
-		 		wheelAnimationForward();
-
-				XForward = true;
 
 				if(currentTrack == (playlist.length - 1)){
 					currentTrack = 0;
