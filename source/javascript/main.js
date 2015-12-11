@@ -23,6 +23,7 @@
 			console.log('the current track is: ' + currentTrack);
 
 
+
 			// wheel animation left
 			function wheelAnimationL() {
 				wheelL.animate({ transform: 'r360,30,30'}
@@ -186,7 +187,19 @@
 					playStop();
 					forwardStop();
 
-			 		backward.transform('t85.344053, ' + buttonYpositionActive);
+			 		//backward.transform('t85.344053, ' + buttonYpositionActive);
+
+					
+			 		// button anim1
+					var anim1 = function() { 
+					    backward.animate({'transform' : 't85.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
+					}
+
+					var anim2 = function() { 
+					    backward.animate({'transform' : 't85.344053, ' + buttonYposition}, 200);
+					}
+
+					anim1();
 					
 					wheelAnimationBackward();
 
@@ -200,6 +213,7 @@
 						console.log('bw - the current track is: ' + currentTrack);
 
 					} else {
+
 					    currentTrack = (playlist.length - 1);
 
 					    console.log('bw - the current track is: ' + currentTrack);
@@ -211,12 +225,7 @@
 	   	 			audio.play();
 
 
-				}  else {
-
-					backwardStop();
-
-
-				}
+				}  
 			});
 			// end backward function
 
@@ -259,7 +268,18 @@
 					backwardStop();
 					playStop();
 
-			 		forward.transform('t254.344053,' + buttonYpositionActive);
+			 		//forward.transform('t254.344053,' + buttonYpositionActive);
+
+			 		// button anim1
+					var anim1 = function() { 
+					    forward.animate({'transform' : 't254.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
+					}
+
+					var anim2 = function() { 
+					    forward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
+					}
+
+					anim1();
 
 			 		wheelAnimationForward();
 
@@ -279,11 +299,7 @@
 
 	   	 			console.log('fw - the current track is: ' + currentTrack);
 
-				}  else {
-
-					forwardStop();
-
-				}
+				}  
 			});
 			// end forward function
 
