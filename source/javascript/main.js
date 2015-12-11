@@ -55,24 +55,10 @@
 			  	stopAnimation();
 				xRec = false;
 			}
-			function backwardStop() {
-				backward.transform('t85.344053, ' + buttonYposition);
-				stopAnimation();
-				xBackward = false;
-			}
 			function playStop() {
 			  	play.transform('t169.344053, ' + buttonYposition);
 			  	stopAnimation();
 				xPlay = false;
-			}
-			function forwardStop() {
-				forward.transform('t254.344053, ' + buttonYposition);
-				stopAnimation();
-				XForward = false;
-			}
-			function tapeAnimationBackward() {
-				//translate(44.709110, 0.680291)
-				
 			}
 			function tapeAnimationPlay() {
 				//translate(44.709110, 0.680291)
