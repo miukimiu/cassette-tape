@@ -45,24 +45,18 @@
 				wheelAnimationL();
 			}
 			
-			function stopAnimation() {
+			function stopWheelAnimation() {
 				wheelL.stop();
 				wheelR.stop();
 			}
 
 			function recStop() {
 			  	rec.transform('t0.344053, ' + buttonYposition);
-			  	stopAnimation();
 				xRec = false;
 			}
-			function backwardStop() {
-				backward.transform('t85.344053, ' + buttonYposition);
-				stopAnimation();
-				xBackward = false;
-			}
+			
 			function playStop() {
 			  	play.transform('t169.344053, ' + buttonYposition);
-			  	stopAnimation();
 				xPlay = false;
 			}
 			function forwardStop() {
@@ -84,23 +78,60 @@
 			 	
 			 	if (!xRec){
 
-			 		playStop();
-					backwardStop();
-					forwardStop();
-
 			 		rec.transform('t0.344053, ' + buttonYpositionActive);
 
 			 		// wheels events
-					wheelAnimation();
-			 		
+
+			 		if (!xPlay) { // is stopped or paused
+						wheelAnimation();
+			 		}
+
 					xRec = true;
 
 				}  else {
-
 					recStop();
+
+					if (!xPlay) { // is stopped or paused
+						
+						stopWheelAnimation();
+					}
 				}
 			});
 			// end rec function
+
+			// play function
+			play.click(function() {
+			 	
+			 	if (!xPlay) { // is stopped or paused
+
+			 		play.transform('t169.344053, ' + buttonYpositionActive);
+					
+					if (!xRec) { // is stopped or paused
+						wheelAnimation();
+			 		}
+				
+					xPlay = true;
+
+					audio.src = playlist[currentTrack];
+
+					console.log(playlist[currentTrack]);
+
+	   	 			audio.play();
+
+				}  else { // if is playing
+					audio.pause();
+
+					// play stop
+				  	playStop();
+
+				  	if (!xRec) { // is stopped or paused
+				  		stopWheelAnimation();
+				  	}
+
+				  	console.log('play - the current track is: ' + currentTrack);
+				}
+			});
+			// end play function
 
 			// backward function
 			backward.click(function() {
@@ -138,37 +169,6 @@
 
 			});
 			// end backward function
-
-			// play function
-			play.click(function() {
-			 	
-			 	if (!xPlay){ // is stopped or paused
-
-			 		recStop();
-					backwardStop();
-					forwardStop();
-
-			 		play.transform('t169.344053, ' + buttonYpositionActive);
-					
-					wheelAnimation();
-
-					xPlay = true;
-
-					audio.src = playlist[currentTrack];
-
-					console.log(playlist[currentTrack]);
-
-	   	 			audio.play();
-
-				}  else { // if is playing
-					audio.pause();
-				  	playStop();
-
-				  	console.log('play - the current track is: ' + currentTrack);
-				}
-			});
-			// end play function
-
 			// forward function
 			forward.click(function() {
 
