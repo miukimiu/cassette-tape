@@ -20,8 +20,6 @@
 
 			console.log('the current track is: ' + currentTrack);
 
-
-
 			// wheel animation left
 			function wheelAnimationL() {
 				wheelL.animate({ transform: 'r360,30,30'}
