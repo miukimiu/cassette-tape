@@ -181,56 +181,41 @@
 			// backward function
 			backward.click(function() {
 			 	
-			 	if (!xBackward){
-
-			 		recStop();
-					playStop();
-					forwardStop();
-
-			 		//backward.transform('t85.344053, ' + buttonYpositionActive);
-
-					
-			 		// button anim1
-					var anim1 = function() { 
-					    backward.animate({'transform' : 't85.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
-					}
-
-					var anim2 = function() { 
-					    backward.animate({'transform' : 't85.344053, ' + buttonYposition}, 200);
-					}
-
-					anim1();
-					
-					wheelAnimationBackward();
-
-					xBackward = true;
-
-					if(currentTrack > 0 ) {
-
-						currentTrack--;
-
-
-						console.log('bw - the current track is: ' + currentTrack);
-
-					} else {
-
-					    currentTrack = (playlist.length - 1);
-
-					    console.log('bw - the current track is: ' + currentTrack);
-					}
-
-					audio.src = playlist[currentTrack];
-
-
-	   	 			audio.play();
-
-
-				}  else {
-
-					backwardStop();
-
-
+				// button anim1
+				var anim1 = function() { 
+				    backward.animate({'transform' : 't85.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
 				}
+
+				var anim2 = function() { 
+				    backward.animate({'transform' : 't85.344053, ' + buttonYposition}, 200);
+				}
+
+				anim1();
+				
+				wheelAnimationBackward();
+
+				xBackward = true;
+
+				if(currentTrack > 0 ) {
+
+					currentTrack--;
+
+
+					console.log('bw - the current track is: ' + currentTrack);
+
+				} else {
+
+				    currentTrack = (playlist.length - 1);
+
+				    console.log('bw - the current track is: ' + currentTrack);
+				}
+
+				audio.src = playlist[currentTrack];
+
+				if (xPlay) { // if is playing
+					audio.play();
+				}
+				
 			});
 			// end backward function
 
@@ -266,49 +251,38 @@
 
 			// forward function
 			forward.click(function() {
-			 	
-			 	if (!XForward){
 
-			 		recStop();
-					backwardStop();
-					playStop();
-
-			 		//forward.transform('t254.344053,' + buttonYpositionActive);
-
-			 		// button anim1
-					var anim1 = function() { 
-					    forward.animate({'transform' : 't254.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
-					}
-
-					var anim2 = function() { 
-					    forward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
-					}
-
-					anim1();
-
-			 		wheelAnimationForward();
-
-					XForward = true;
-
-					if(currentTrack == (playlist.length - 1)){
-						currentTrack = 0;
-					} else {
-					    currentTrack++;	
-					}
-
-					audio.src = playlist[currentTrack];
-
-					console.log(playlist[currentTrack]);
-
-	   	 			audio.play();
-
-	   	 			console.log('fw - the current track is: ' + currentTrack);
-
-				}  else {
-
-					forwardStop();
-
+				// button anim1
+				var anim1 = function() { 
+				    forward.animate({'transform' : 't254.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
 				}
+
+				var anim2 = function() { 
+				    forward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
+				}
+
+				anim1();
+
+		 		wheelAnimationForward();
+
+				XForward = true;
+
+				if(currentTrack == (playlist.length - 1)){
+					currentTrack = 0;
+				} else {
+				    currentTrack++;	
+				}
+
+				console.log('fw - the current track is: ' + currentTrack);
+
+				audio.src = playlist[currentTrack];
+
+
+				if (xPlay) { // if is playing
+					audio.play();
+				}
+	
+
 			});
 			// end forward function
 
