@@ -9,6 +9,8 @@
 			wheelR = Snap('#wheel-r'),
 			tapeL = Snap('#tapeL'),
 			tapeR = Snap('#tapeR'),
+			curtimetext = document.getElementById("curtimetext"),
+			durtimetext = document.getElementById("durtimetext"),
 			buttonYposition = 0.679477,
 			buttonYpositionActive = 8.679477,
 			bboxL = tapeL.getBBox(),
@@ -16,7 +18,24 @@
 			audio = new Audio(),
 			duration = audio.duration,
 			playlist = new Array('audio/cesaria.mp3', 'audio/no_trends.mp3', 'audio/you_got_me.mp3'),
-			currentTrack = 0;
+			currentTrack = 0,
+			seekslider,
+			seeking=false, 
+			seekto, 
+			curtimetext, 
+			durtimetext;
+
+
+			seekslider = document.getElementById("seekslider");
+			
+			curtimetext = document.getElementById("curtimetext");
+			durtimetext = document.getElementById("durtimetext");
+			// Add Event Handling
+	
+			seekslider.addEventListener("mousedown", function(event){ seeking=true; seek(event); });
+			seekslider.addEventListener("mousemove", function(event){ seek(event); });
+			seekslider.addEventListener("mouseup",function(){ seeking=false; });
+			audio.addEventListener("timeupdate", function(){ seektimeupdate(); });
 
 			console.log('the current track is: ' + currentTrack);
 
@@ -202,5 +221,24 @@
 			});
 			// end forward function
 
-			
-
+			function seek(event){
+			    if(seeking){
+				    seekslider.value = event.clientX - seekslider.offsetLeft;
+			        seekto = audio.duration * (seekslider.value / 100);
+			        audio.currentTime = seekto;
+			    }
+		    }		
+		    function seektimeupdate(){
+				var nt = audio.currentTime * (100 / audio.duration);
+				seekslider.value = nt;
+				var curmins = Math.floor(audio.currentTime / 60);
+			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
+			    var durmins = Math.floor(audio.duration / 60);
+			    var dursecs = Math.floor(audio.duration - durmins * 60);
+				if(cursecs < 10){ cursecs = "0"+cursecs; }
+			    if(dursecs < 10){ dursecs = "0"+dursecs; }
+			    if(curmins < 10){ curmins = "0"+curmins; }
+			    if(durmins < 10){ durmins = "0"+durmins; }
+				curtimetext.innerHTML = curmins+":"+cursecs;
+			    durtimetext.innerHTML = durmins+":"+dursecs;
+			}
