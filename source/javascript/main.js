@@ -11,6 +11,7 @@
 			tapeR = Snap('#tapeR'),
 			curtimetext = Snap('#curtimetext tspan'),
 			durtimetext = Snap('#durtimetext tspan'),
+			tracktitle = Snap('#tracktitle tspan'),
 			buttonYposition = 0.679477,
 			buttonYpositionActive = 8.679477,
 			bboxL = tapeL.getBBox(),
@@ -39,7 +40,8 @@
 			seekslider.addEventListener("mousedown", function(event){ seeking=true; seek(event); });
 			seekslider.addEventListener("mousemove", function(event){ seek(event); });
 			seekslider.addEventListener("mouseup",function(){ seeking=false; });
-			audio.addEventListener("timeupdate", function(){ timeupdate(); });
+			audio.addEventListener("timeupdate", function(){ timeUpdate(); });
+			audio.addEventListener("tracktitle", function(){ titleUpdate(); });
 
 			console.log('the current track is: ' + currentTrack);
 
@@ -137,6 +139,8 @@
 
 					audio.src = playlist[currentTrack];
 
+					titleUpdate();
+					
 					console.log(playlist[currentTrack]);
 
 	   	 			audio.play();
@@ -186,6 +190,8 @@
 
 				audio.src = playlist[currentTrack];
 
+				titleUpdate();
+
 				if (xPlay) { // if is playing
 					audio.play();
 				}
@@ -216,6 +222,7 @@
 
 				audio.src = playlist[currentTrack];
 
+				titleUpdate();
 
 				if (xPlay) { // if is playing
 					audio.play();
@@ -232,7 +239,7 @@
 			        audio.currentTime = seekto;
 			    }
 		    }		
-		    function timeupdate(){
+		    function timeUpdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
 				seekslider.value = nt;
 				var curmins = Math.floor(audio.currentTime / 60);
@@ -246,3 +253,7 @@
 				curtimetext.node.innerHTML = curmins+":"+cursecs;
 			    durtimetext.node.innerHTML = durmins+":"+dursecs;
 			}
+			function titleUpdate(){
+				tracktitle.node.innerHTML = playlist[currentTrack];
+			}
+			
