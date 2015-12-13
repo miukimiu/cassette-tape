@@ -9,8 +9,8 @@
 			wheelR = Snap('#wheel-r'),
 			tapeL = Snap('#tapeL'),
 			tapeR = Snap('#tapeR'),
-			curtimetext = document.getElementById("curtimetext"),
-			durtimetext = document.getElementById("durtimetext"),
+			curtimetext = Snap('#curtimetext tspan'),
+			durtimetext = Snap('#durtimetext tspan'),
 			buttonYposition = 0.679477,
 			buttonYpositionActive = 8.679477,
 			bboxL = tapeL.getBBox(),
@@ -21,21 +21,25 @@
 			currentTrack = 0,
 			seekslider,
 			seeking=false, 
-			seekto, 
-			curtimetext, 
-			durtimetext;
+			seekto;
 
+
+			//curtimetext.node.textContent. = "00:03";
+			//curtimetext.node.innerHTML = "New";
+			//curtimetext.node.innerHTML = 'yep'
+
+			console.log(durtimetext);
 
 			seekslider = document.getElementById("seekslider");
 			
-			curtimetext = document.getElementById("curtimetext");
-			durtimetext = document.getElementById("durtimetext");
+			//curtimetext = document.getElementById("curtimetext");
+			//durtimetext = document.getElementById("durtimetext");
 			// Add Event Handling
 	
 			seekslider.addEventListener("mousedown", function(event){ seeking=true; seek(event); });
 			seekslider.addEventListener("mousemove", function(event){ seek(event); });
 			seekslider.addEventListener("mouseup",function(){ seeking=false; });
-			audio.addEventListener("timeupdate", function(){ seektimeupdate(); });
+			audio.addEventListener("timeupdate", function(){ timeupdate(); });
 
 			console.log('the current track is: ' + currentTrack);
 
@@ -228,7 +232,7 @@
 			        audio.currentTime = seekto;
 			    }
 		    }		
-		    function seektimeupdate(){
+		    function timeupdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
 				seekslider.value = nt;
 				var curmins = Math.floor(audio.currentTime / 60);
@@ -239,6 +243,6 @@
 			    if(dursecs < 10){ dursecs = "0"+dursecs; }
 			    if(curmins < 10){ curmins = "0"+curmins; }
 			    if(durmins < 10){ durmins = "0"+durmins; }
-				curtimetext.innerHTML = curmins+":"+cursecs;
-			    durtimetext.innerHTML = durmins+":"+dursecs;
+				curtimetext.node.innerHTML = curmins+":"+cursecs;
+			    durtimetext.node.innerHTML = durmins+":"+dursecs;
 			}
