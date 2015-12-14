@@ -2,11 +2,14 @@
 		var rec = Snap('#rec'),
 			xRec = false,
 			backward = Snap('#backward'),
-			play = Snap('#play'),
-			xPlay = false,
+			playPause = Snap('#playPause'),
+			playState = Snap('#playState'),
+			pauseState = Snap('#pauseState'),
+			playActive = false,
 			forward = Snap('#forward'),
 			wheelL = Snap('#wheel-l'),
 			wheelR = Snap('#wheel-r'),
+			tape = Snap('#tape'),
 			tapeL = Snap('#tapeL'),
 			tapeR = Snap('#tapeR'),
 			curtimetext = Snap('#curtimetext tspan'),
@@ -18,18 +21,24 @@
 			bboxR = tapeR.getBBox(),
 			audio = new Audio(),
 			duration = audio.duration,
-			playlist = new Array('audio/cesaria.mp3', 'audio/no_trends.mp3', 'audio/you_got_me.mp3'),
+			playlist = ['cesaria', 'no_trends', 'you_got_me'],
+			dir = "audio/",
+			ext = ".mp3",
 			currentTrack = 0,
 			seekslider,
-			seeking=false, 
+			seeking=false,
 			seekto;
 
+			pauseState.attr("display", "none");
+
+			// Audio Object
+			audio.src = dir+playlist[0]+ext;
 
 			//curtimetext.node.textContent. = "00:03";
 			//curtimetext.node.innerHTML = "New";
 			//curtimetext.node.innerHTML = 'yep'
 
-			console.log(durtimetext);
+			console.log(audio.src);
 
 			seekslider = document.getElementById("seekslider");
 			
@@ -81,8 +90,8 @@
 			}
 			
 			function playStop() {
-			  	play.transform('t169.344053, ' + buttonYposition);
-				xPlay = false;
+			  	playPause.transform('t169.344053, ' + buttonYposition);
+				playActive = false;
 			}
 			function forwardStop() {
 				forward.transform('t254.344053, ' + buttonYposition);
@@ -97,7 +106,7 @@
 				//translate(44.709110, 0.680291)
 				tape.animate( { 'transform' : 't84.709110, 0.680291' }, 14000);
 			}
-			
+		
 			// rec function
 			rec.click(function() {
 			 	
@@ -107,7 +116,7 @@
 
 			 		// wheels events
 
-			 		if (!xPlay) { // is stopped or paused
+			 		if (!playActive) { // is stopped or paused
 						wheelAnimation();
 			 		}
 
@@ -116,7 +125,7 @@
 				}  else {
 					recStop();
 
-					if (!xPlay) { // is stopped or paused
+					if (!playActive) { // is stopped or paused
 						
 						stopWheelAnimation();
 					}
@@ -125,38 +134,44 @@
 			// end rec function
 
 			// play function
-			play.click(function() {
+			playPause.click(function() {
 			 	
-			 	if (!xPlay) { // is stopped or paused
+			 	if(audio.paused) { 
 
-			 		play.transform('t169.344053, ' + buttonYpositionActive);
-					
+			 		// play state
+
+			 		playActive = true;
+
+			 		playState.attr("display", "none");
+			 		pauseState.attr("display", "block");
+
+			 		console.log(playActive);
+
 					if (!xRec) { // is stopped or paused
 						wheelAnimation();
 			 		}
-				
-					xPlay = true;
+					playPause.transform('t169.344053, ' + buttonYpositionActive);
+				    audio.play();
+				    titleUpdate();
 
-					audio.src = playlist[currentTrack];
+			    } else {
 
-					titleUpdate();
-					
-					console.log(playlist[currentTrack]);
+			    	// pause state
 
-	   	 			audio.play();
+			    	playActive = false;
 
-				}  else { // if is playing
-					audio.pause();
+			    	pauseState.attr("display", "none");
+			    	playState.attr("display", "block");
 
-					// play stop
-				  	playStop();
+			    	console.log(playActive);
+
+				    audio.pause();
 
 				  	if (!xRec) { // is stopped or paused
 				  		stopWheelAnimation();
 				  	}
-
-				  	console.log('play - the current track is: ' + currentTrack);
-				}
+				  	playPause.transform('t169.344053, ' + buttonYposition);
+			    }
 			});
 			// end play function
 
@@ -188,11 +203,11 @@
 				    console.log('bw - the current track is: ' + currentTrack);
 				}
 
-				audio.src = playlist[currentTrack];
+				audio.src = dir+playlist[currentTrack]+ext;
 
 				titleUpdate();
 
-				if (xPlay) { // if is playing
+				if (playActive) { // if is playing
 					audio.play();
 				}
 
@@ -220,14 +235,13 @@
 
 				console.log('fw - the current track is: ' + currentTrack);
 
-				audio.src = playlist[currentTrack];
+				audio.src = dir+playlist[currentTrack]+ext;
 
 				titleUpdate();
 
-				if (xPlay) { // if is playing
+				if (playActive) { // if is playing
 					audio.play();
 				}
-	
 
 			});
 			// end forward function
@@ -235,13 +249,15 @@
 			function seek(event){
 			    if(seeking){
 				    seekslider.value = event.clientX - seekslider.offsetLeft;
-			        seekto = audio.duration * (seekslider.value / 100);
-			        audio.currentTime = seekto;
+			        //seekto = audio.duration * (seekslider.value / 100);
+			        //audio.currentTime = seekto;
 			    }
-		    }		
+		    }
+//transform="translate(43.709110, 0.680291)"
 		    function timeUpdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
 				seekslider.value = nt;
+				//orward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
 				var curmins = Math.floor(audio.currentTime / 60);
 			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
 			    var durmins = Math.floor(audio.duration / 60);
