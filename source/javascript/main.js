@@ -46,18 +46,18 @@
 			//durtimetext = document.getElementById("durtimetext");
 			// Add Event Handling
 	
-			seekslider.addEventListener("mousedown", function(event){ seeking=true; seek(event); });
-			seekslider.addEventListener("mousemove", function(event){ seek(event); });
-			seekslider.addEventListener("mouseup",function(){ seeking=false; });
+			audio.addEventListener("ended", function(){ switchTrack(); });
+	
 			audio.addEventListener("timeupdate", function(){ timeUpdate(); });
 			audio.addEventListener("tracktitle", function(){ titleUpdate(); });
+			
+			audio.addEventListener("ended", function(){ nextTrack(); });
 
-			console.log('the current track is: ' + currentTrack);
+		
 
 			// wheel animation left
 			function wheelAnimationL() {
-				wheelL.animate({ transform: 'r360,30,30'}
-					, 2000,
+				wheelL.animate({ transform: 'r360,30,30'}, 2000,
 					function(){ 
 							wheelL.attr({ transform: 'rotate(0 30 30)'});
 							wheelAnimationL();
@@ -66,8 +66,7 @@
 			}
 			// wheel animation right
 			function wheelAnimationR() {
-				wheelR.animate({ transform: 'r360,270,30'}
-					, 2000,
+				wheelR.animate({ transform: 'r360,270,30'}, 2000,
 					function(){ 
 							wheelR.attr({ transform: 'rotate(0 270 30)'});
 							wheelAnimationR();
@@ -98,14 +97,22 @@
 				stopAnimation();
 				XForward = false;
 			}
-			function tapeAnimationBackward() {
-				//translate(44.709110, 0.680291)
-				
+			function nextTrack () {
+
+				if(currentTrack == (playlist.length - 1)){
+					currentTrack = 0;
+				} else {
+				    currentTrack++;	
+				}
+
+				audio.src = dir+playlist[currentTrack]+ext;
+
+				titleUpdate();
+
+				audio.play();
+			
 			}
-			function tapeAnimationPlay() {
-				//translate(44.709110, 0.680291)
-				tape.animate( { 'transform' : 't84.709110, 0.680291' }, 14000);
-			}
+			
 		
 			// rec function
 			rec.click(function() {
@@ -214,7 +221,7 @@
 			});
 			// end backward function
 			// forward function
-			forward.click(function() {
+			forward.click(function() { 
 
 				// button anim1
 				var anim1 = function() { 
@@ -242,7 +249,6 @@
 				if (playActive) { // if is playing
 					audio.play();
 				}
-
 			});
 			// end forward function
 
