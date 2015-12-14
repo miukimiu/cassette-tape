@@ -248,7 +248,7 @@
 
 			function seek(event){
 			    if(seeking){
-				    seekslider.value = event.clientX - seekslider.offsetLeft;
+				    tape.transform('t43.709110, 0.680291');
 			        //seekto = audio.duration * (seekslider.value / 100);
 			        //audio.currentTime = seekto;
 			    }
@@ -257,6 +257,12 @@
 		    function timeUpdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
 				seekslider.value = nt;
+
+				var tapeX = 43.709110 * (audio.currentTime / 100);
+				tape.transform('t' + tapeX +', 0.680291');
+
+				console.log(tapeX);
+
 				//orward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
 				var curmins = Math.floor(audio.currentTime / 60);
 			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
