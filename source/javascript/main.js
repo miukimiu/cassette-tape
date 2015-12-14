@@ -98,7 +98,7 @@
 				XForward = false;
 			}
 			function nextTrack () {
-
+			
 				if(currentTrack == (playlist.length - 1)){
 					currentTrack = 0;
 				} else {
@@ -109,6 +109,7 @@
 
 				titleUpdate();
 
+				
 				audio.play();
 			
 			}
@@ -262,7 +263,6 @@
 //transform="translate(43.709110, 0.680291)"
 		    function timeUpdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
-				seekslider.value = nt;
 
 				var tapeX = 43.709110 * (audio.currentTime / 100);
 				tape.transform('t' + tapeX +', 0.680291');
