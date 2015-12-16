@@ -52,11 +52,10 @@
 			audio.addEventListener("ended", function(){ switchTrack(); });
 	
 			audio.addEventListener("timeupdate", function(){ timeUpdate(); });
+			audio.addEventListener("loadedmetadata", function(){ timeDurUpdate(); });
 			audio.addEventListener("tracktitle", function(){ titleUpdate(); });
 			
 			audio.addEventListener("ended", function(){ nextTrack(); });
-
-		
 
 			// wheel animation left
 			function wheelAnimationL() {
@@ -96,7 +95,7 @@
 				playActive = false;
 			}
 			function forwardStop() {
-				forward.transform('t254.344053, ' + buttonYposition);
+				forward.transform('t253.344053, ' + buttonYposition);
 				stopAnimation();
 				XForward = false;
 			}
@@ -229,11 +228,11 @@
 
 				// button anim1
 				var anim1 = function() { 
-				    forward.animate({'transform' : 't254.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
+				    forward.animate({'transform' : 't253.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
 				}
 
 				var anim2 = function() { 
-				    forward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
+				    forward.animate({'transform' : 't253.344053, ' + buttonYposition}, 200);
 				}
 
 				anim1();
@@ -241,7 +240,7 @@
 				if(currentTrack == (playlist.length - 1)){
 					currentTrack = 0;
 				} else {
-				    currentTrack++;	
+				    currentTrack++;
 				}
 
 				console.log('fw - the current track is: ' + currentTrack);
@@ -268,7 +267,7 @@
 				var nt = audio.currentTime * (100 / audio.duration);
 
 				var tapeX = 43.709110 * (audio.currentTime / 100);
-				//var teset = tapeL.ellipse(460,120,50,80);
+				
 
 				tapeRValue = (audio.currentTime / 2.2);
 				tapeLValue = (audio.duration / 2.2) - (audio.currentTime / 2.2);
@@ -278,20 +277,35 @@
 
 				tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
 				tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear)
-			
 
-				//orward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
+
 				var curmins = Math.floor(audio.currentTime / 60);
 			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
-			    var durmins = Math.floor(audio.duration / 60);
-			    var dursecs = Math.floor(audio.duration - durmins * 60);
+			    
 				if(cursecs < 10){ cursecs = "0"+cursecs; }
-			    if(dursecs < 10){ dursecs = "0"+dursecs; }
+			    
 			    if(curmins < 10){ curmins = "0"+curmins; }
-			    if(durmins < 10){ durmins = "0"+durmins; }
+			   
 				curtimetext.node.innerHTML = curmins+":"+cursecs;
-			    durtimetext.node.innerHTML = durmins+":"+dursecs;
+
+			   
 			}
+			function timeDurUpdate(){
+				//tapeL init
+				tapeLValue = (audio.duration / 2.2);
+				tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
+
+				var durmins = Math.floor(audio.duration / 60);
+			    var dursecs = Math.floor(audio.duration - durmins * 60);
+				if(dursecs < 10){ dursecs = "0"+dursecs; }
+				if(durmins < 10){ durmins = "0"+durmins; }
+
+				if(audio.duration) {
+					durtimetext.node.innerHTML = durmins+":"+dursecs;
+				} else {
+					durtimetext.node.innerHTML = "0:00";
+				}
+			}    
 			function titleUpdate(){
 				tracktitle.node.innerHTML = playlist[currentTrack];
 			}
