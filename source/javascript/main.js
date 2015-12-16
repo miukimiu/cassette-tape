@@ -260,14 +260,22 @@
 			        //audio.currentTime = seekto;
 			    }
 		    }
-//transform="translate(43.709110, 0.680291)"
+
 		    function timeUpdate(){
 				var nt = audio.currentTime * (100 / audio.duration);
 
 				var tapeX = 43.709110 * (audio.currentTime / 100);
-				tape.transform('t' + tapeX +', 0.680291');
+				//var teset = tapeL.ellipse(460,120,50,80);
 
-				console.log(tapeX);
+				var tapeLValue = 40 + (audio.currentTime / 3);
+				var tapeRValue = 40 + (audio.duration / 3) - (audio.currentTime / 3);
+
+				console.log('duration ' + audio.duration);
+				console.log('tapeRValue ' + tapeRValue);
+
+				tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
+				tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear)
+			
 
 				//orward.animate({'transform' : 't254.344053, ' + buttonYposition}, 200);
 				var curmins = Math.floor(audio.currentTime / 60);
