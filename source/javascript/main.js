@@ -31,14 +31,17 @@
 
 			pauseState.attr("display", "none");
 
+			
+
 			// Audio Object
 			audio.src = dir+playlist[0]+ext;
 
-			//curtimetext.node.textContent. = "00:03";
-			//curtimetext.node.innerHTML = "New";
-			//curtimetext.node.innerHTML = 'yep'
+			// reel sizes
+			var tapeRValue = 0;
+			var tapeLValue = 90;
 
-			console.log(audio.src);
+			tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
+			tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear)
 
 			seekslider = document.getElementById("seekslider");
 			
@@ -57,7 +60,7 @@
 
 			// wheel animation left
 			function wheelAnimationL() {
-				wheelL.animate({ transform: 'r360,30,30'}, 2000,
+				wheelL.animate({ transform: 'r-360,30,30'}, 2000,
 					function(){ 
 							wheelL.attr({ transform: 'rotate(0 30 30)'});
 							wheelAnimationL();
@@ -66,7 +69,7 @@
 			}
 			// wheel animation right
 			function wheelAnimationR() {
-				wheelR.animate({ transform: 'r360,270,30'}, 2000,
+				wheelR.animate({ transform: 'r-360,270,30'}, 2000,
 					function(){ 
 							wheelR.attr({ transform: 'rotate(0 270 30)'});
 							wheelAnimationR();
@@ -267,8 +270,8 @@
 				var tapeX = 43.709110 * (audio.currentTime / 100);
 				//var teset = tapeL.ellipse(460,120,50,80);
 
-				var tapeLValue = 40 + (audio.currentTime / 3);
-				var tapeRValue = 40 + (audio.duration / 3) - (audio.currentTime / 3);
+				tapeRValue = (audio.currentTime / 2.2);
+				tapeLValue = (audio.duration / 2.2) - (audio.currentTime / 2.2);
 
 				console.log('duration ' + audio.duration);
 				console.log('tapeRValue ' + tapeRValue);
