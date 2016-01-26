@@ -9,6 +9,9 @@ Plugins and libraries in use:
 * [Recorderjs](https://github.com/mattdiamond/Recorderjs)
 * [Snap.svg](https://github.com/adobe-webplatform/Snap.svg)
 
+# Demo
+[Demo](https://miukimiu.github.io/cassette-player/)
+
 ### Install gulp and Bower
 
 Building the player requires [node.js](http://nodejs.org/download/)
