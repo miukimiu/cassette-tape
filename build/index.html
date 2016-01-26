@@ -48,14 +48,8 @@
                         </g>
                         <g id="timebox" transform="translate(234.000000, 178.000000)">
                             <rect id="timebox-bg" fill="#0A0D10" sketch:type="MSShapeGroup" x="0" y="0" width="135" height="20"></rect>
-                            <text id="curtimetext" sketch:type="MSTextLayer" font-family="Helvetica" font-size="13" font-weight="normal" sketch:alignment="middle" fill="#36C77C">
-                                <tspan x="21.2341309" y="15">00:00</tspan>
-                            </text>
-                            <text id="/" sketch:type="MSTextLayer" font-family="Helvetica" font-size="13" font-weight="normal" sketch:alignment="middle" fill="#36C77C">
-                                <tspan x="65.1940918" y="15">/</tspan>
-                            </text>
-                            <text id="durtimetext" sketch:type="MSTextLayer" font-family="Helvetica" font-size="13" font-weight="normal" sketch:alignment="middle" fill="#36C77C">
-                                <tspan x="80.2341309" y="15">00:00</tspan>
+                            <text id="recordingText" sketch:type="MSTextLayer" font-family="Helvetica" font-size="13" font-weight="normal" sketch:alignment="middle" fill="#36C77C">
+                                <tspan x="21.2341309" y="15"></tspan>
                             </text>
                         </g>
                         <g id="tracktitlebox" transform="translate(85.000000, 66.000000)" font-weight="normal" font-family="Helvetica" fill="#E83B4D" font-size="13" sketch:alignment="middle" sketch:type="MSTextLayer">
@@ -154,13 +148,22 @@
                     </g>
                 </g>
             </svg>
+
+            <br>
+            <br>
+            <br>
+
+            <h2>Recordings list</h2>
+            <ul id="recordingslist"></ul>
+
         </div>
         <!-- / main-->
     </div>
     <!-- / wrap -->
 
     <script src='assets/javascript/vendor/snap.svg-min.js'></script>
+    <script src="assets/javascript/recorder.js"></script>
     <script src="assets/javascript/main.js"></script>
-    
+
   </body>
 </html>

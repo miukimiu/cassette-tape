@@ -12,8 +12,7 @@
 			tape = Snap('#tape'),
 			tapeL = Snap('#tapeL'),
 			tapeR = Snap('#tapeR'),
-			curtimetext = Snap('#curtimetext tspan'),
-			durtimetext = Snap('#durtimetext tspan'),
+			logText = Snap('#recordingText tspan'),
 			tracktitle = Snap('#tracktitle tspan'),
 			buttonYposition = 0.679477,
 			buttonYpositionActive = 8.679477,
@@ -27,11 +26,11 @@
 			currentTrack = 0,
 			seekslider,
 			seeking=false,
+			audio_context,
+			recorder,
 			seekto;
 
 			pauseState.attr("display", "none");
-
-
 
 			// Audio Object
 			audio.src = dir+playlist[0]+ext;
@@ -40,16 +39,10 @@
 			var tapeRValue = 0;
 			var tapeLValue = 90;
 
-			tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
-			tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear)
+			tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear);
+			tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear);
 
 			seekslider = document.getElementById("seekslider");
-
-			//curtimetext = document.getElementById("curtimetext");
-			//durtimetext = document.getElementById("durtimetext");
-			// Add Event Handling
-
-			//audio.addEventListener("ended", function(){ switchTrack(); });
 
 			audio.addEventListener('ended', function() {
 				this.currentTime = 0;
@@ -121,33 +114,6 @@
 
 			}
 
-
-			// rec function
-			rec.click(function() {
-
-			 	if (!xRec){
-
-			 		rec.transform('t0.344053, ' + buttonYpositionActive);
-
-			 		// wheels events
-
-			 		if (!playActive) { // is stopped or paused
-						wheelAnimation();
-			 		}
-
-					xRec = true;
-
-				}  else {
-					recStop();
-
-					if (!playActive) { // is stopped or paused
-
-						stopWheelAnimation();
-					}
-				}
-			});
-			// end rec function
-
 			// play function
 			playPause.click(function() {
 
@@ -160,7 +126,7 @@
 			 		playState.attr("display", "none");
 			 		pauseState.attr("display", "block");
 
-			 		console.log(playActive);
+			 		//console.log(playActive);
 
 					if (!xRec) { // is stopped or paused
 						wheelAnimation();
@@ -200,11 +166,11 @@
 				// button anim1
 				var anim1 = function() {
 				    backward.animate({'transform' : 't85.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
-				}
+				};
 
 				var anim2 = function() {
 				    backward.animate({'transform' : 't85.344053, ' + buttonYposition}, 200);
-				}
+				};
 
 				anim1();
 
@@ -212,14 +178,10 @@
 
 					currentTrack--;
 
-
-					//console.log('bw - the current track is: ' + currentTrack);
-
 				} else {
 
 				    currentTrack = (playlist.length - 1);
 
-				    //console.log('bw - the current track is: ' + currentTrack);
 				}
 
 				audio.src = dir+playlist[currentTrack]+ext;
@@ -232,17 +194,18 @@
 
 			});
 			// end backward function
+
 			// forward function
 			forward.click(function() {
 
 				// button anim1
 				var anim1 = function() {
 				    forward.animate({'transform' : 't253.344053, ' + buttonYpositionActive}, 200, mina.linear, anim2);
-				}
+				};
 
 				var anim2 = function() {
 				    forward.animate({'transform' : 't253.344053, ' + buttonYposition}, 200);
-				}
+				};
 
 				anim1();
 
@@ -264,57 +227,97 @@
 			});
 			// end forward function
 
-			function seek(event){
-			    if(seeking){
-				    tape.transform('t43.709110, 0.680291');
-			        //seekto = audio.duration * (seekslider.value / 100);
-			        //audio.currentTime = seekto;
-			    }
-		    }
-
-		    function timeUpdate(){
-				var nt = audio.currentTime * (100 / audio.duration);
-
-				var tapeX = 43.709110 * (audio.currentTime / 100);
-
-
-				tapeRValue = (audio.currentTime / 2.2);
-				tapeLValue = (audio.duration / 2.2) - (audio.currentTime / 2.2);
-
-				console.log('duration ' + audio.duration);
-				console.log('tapeRValue ' + tapeRValue);
-
-				tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
-				tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear)
-
-
-				var curmins = Math.floor(audio.currentTime / 60);
-			    var cursecs = Math.floor(audio.currentTime - curmins * 60);
-
-				if(cursecs < 10){ cursecs = "0"+cursecs; }
-
-			    if(curmins < 10){ curmins = "0"+curmins; }
-
-				curtimetext.node.innerHTML = curmins+":"+cursecs;
-
-
-			}
-			function timeDurUpdate(){
-				//tapeL init
-				tapeLValue = (audio.duration / 2.2);
-				tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear)
-
-				var durmins = Math.floor(audio.duration / 60);
-			    var dursecs = Math.floor(audio.duration - durmins * 60);
-				if(dursecs < 10){ dursecs = "0"+dursecs; }
-				if(durmins < 10){ durmins = "0"+durmins; }
-
-				if(audio.duration) {
-					durtimetext.node.innerHTML = durmins+":"+dursecs;
-				} else {
-					durtimetext.node.innerHTML = "0:00";
-				}
-			}
 			function titleUpdate(){
 				tracktitle.node.innerHTML = playlist[currentTrack];
 			}
+
+			// ******** Recorder ******* //
+			function __log(e, data) {
+				logText.node.innerHTML = "\n" + e + " " + (data || '');
+			}
+
+			function startUserMedia(stream) {
+				var input = audio_context.createMediaStreamSource(stream);
+				__log('Media stream created.');
+				// Uncomment if you want the audio to feedback directly
+				//input.connect(audio_context.destination);
+				//__log('Input connected to audio context destination.');
+
+				recorder = new Recorder(input);
+				__log('Recorder initialised.');
+			}
+
+			// rec function
+			rec.click(function() {
+
+				if (!xRec){ //start recording
+
+					rec.transform('t0.344053, ' + buttonYpositionActive);
+
+					// wheels events
+
+					if (!playActive) { // is stopped or paused
+						wheelAnimation();
+					}
+
+					xRec = true;
+
+					recorder && recorder.record();
+
+					__log('Recording...');
+
+				}  else { //stop recording
+					recStop();
+
+					if (!playActive) { // is stopped or paused
+
+						stopWheelAnimation();
+					}
+
+					recorder && recorder.stop();
+
+					__log('Stopped recording.');
+
+					// create WAV download link using audio data blob
+					createDownloadLink();
+
+					recorder.clear();
+				}
+			});
+			// end rec function
+
+			function createDownloadLink() {
+				recorder && recorder.exportWAV(function(blob) {
+					var url = URL.createObjectURL(blob);
+					var li = document.createElement('li');
+					var au = document.createElement('audio');
+					var hf = document.createElement('a');
+
+					au.controls = true;
+					au.src = url;
+					hf.href = url;
+					hf.download = new Date().toISOString() + '.wav';
+					hf.innerHTML = hf.download;
+					//li.appendChild(au); // I don't want the default browser player.
+					li.appendChild(hf); // i just want the link of the recorded audio to download
+					recordingslist.appendChild(li);
+				});
+			}
+			window.onload = function init() {
+				try {
+					// webkit shim
+					window.AudioContext = window.AudioContext || window.webkitAudioContext;
+					navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+					window.URL = window.URL || window.webkitURL;
+
+					audio_context = new AudioContext;
+					__log('Audio context set up.');
+					__log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+				} catch (e) {
+					alert('No web audio support in this browser!');
+				}
+
+				navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+					__log('No live audio input: ' + e);
+				});
+			};
