@@ -10,7 +10,7 @@ var gulp  = require('gulp'),
     input  = {
       'sass': 'source/scss/**/*.scss',
       'javascript': 'source/javascript/*.js',
-      'vendorjs': 'build/assets/javascript/vendor/**/*.js',
+      'vendorjs': 'source/javascript/vendor/*.js',
       'html': 'source/*.html',
       'audio': 'source/audio/*.mp3'
     },
@@ -18,6 +18,7 @@ var gulp  = require('gulp'),
     output = {
       'stylesheets': 'build/assets/stylesheets',
       'javascript': 'build/assets/javascript',
+      'vendorjs': 'build/assets/javascript/vendor',
       'html': 'build',
       'audio': 'build/audio'
     };
@@ -56,9 +57,20 @@ gulp.task('build-js', function() {
     .pipe(sourcemaps.init())
       .pipe(concat('main.js'))
       //only uglify if gulp is ran with '--type production'
-      .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop()) 
+      .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop())
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(output.javascript));
+});
+
+/* concat javascript files, minify if --type production */
+gulp.task('build-vendorjs', function() {
+  return gulp.src(input.vendorjs)
+    .pipe(sourcemaps.init())
+      .pipe(concat('vendor.js'))
+      //only uglify if gulp is ran with '--type production'
+      .pipe(gutil.env.type === 'production' ? uglify() : gutil.noop())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(output.vendorjs));
 });
 
 // deploy
@@ -79,6 +91,7 @@ gulp.task('browser-sync', function() {
 /* Watch these files for changes and run the task on update */
 gulp.task('watch', function() {
   gulp.watch(input.javascript, ['jshint', 'build-js']);
+  gulp.watch(input.vendorjs, ['jshint', 'build-vendorjs']);
   gulp.watch(input.sass, ['build-css']);
   gulp.watch(input.html, ['build-html']);
 });
