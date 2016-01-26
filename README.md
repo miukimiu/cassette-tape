@@ -1,17 +1,13 @@
 # Cassette Player
 
-Cassete player is a html 5 music player created with SVG and manipulated with snap.svg and javascript.
+Cassete player is a html 5 hiphop drum loop player and voice recorder. Perfect to record your freestyles in a window browser.
 
-You can design any svg player and you just need to give the right IDs. The javacript will find all the IDs and manipulate them.
+The cassette tape was designed with Sketch app and exported as SVG. Then manipulated with snap.svg and javascript.
 
-These are the available player controls and IDs:
+Plugins and libraries in use:
 
-* #play - your play button should have this id
-* #forward - your forward button should have this id
-* #backward - your backward button should have this id
-* #rec - your rec button should have this id
-
-This project is in development. So, it means is not working properly.
+* [Recorderjs](https://github.com/mattdiamond/Recorderjs)
+* [Snap.svg](https://github.com/adobe-webplatform/Snap.svg)
 
 ### Install gulp and Bower
 
