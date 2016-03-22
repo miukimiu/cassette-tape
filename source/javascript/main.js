@@ -35,13 +35,6 @@
 			// Audio Object
 			audio.src = dir+playlist[0]+ext;
 
-			// reel sizes
-			var tapeRValue = 0;
-			var tapeLValue = 90;
-
-			tapeL.animate({rx: tapeLValue, ry: tapeLValue}, 500, mina.linear);
-			tapeR.animate({rx: tapeRValue, ry: tapeRValue}, 500, mina.linear);
-
 			seekslider = document.getElementById("seekslider");
 
 			audio.addEventListener('ended', function() {
@@ -66,21 +59,45 @@
 			}
 			// wheel animation right
 			function wheelAnimationR() {
-				wheelR.animate({ transform: 'r-360,270,30'}, 2000,
+				wheelR.animate({ cx: 'r-360,270,30'}, 2000,
 					function(){
-							wheelR.attr({ transform: 'rotate(0 270 30)'});
+							wheelR.attr({ cx: 'rotate(0 270 30)'});
 							wheelAnimationR();
 						}
 				);
 			}
+
+			// wheel animation left
+			function tapeAnimationL() {
+				tapeL.animate({ cx: '90.3893'}, 500,
+					function(){
+							tapeL.attr({ cx: '92.3893'});
+							tapeAnimationL();
+						}
+				);
+			}
+			// wheel animation right
+			function tapeAnimationR() {
+				tapeR.animate({ cx: '330.389'}, 500,
+					function(){
+							tapeR.attr({ cx: '328.389'});
+							tapeAnimationR();
+						}
+				);
+			}
+
 			function wheelAnimation() {
 				wheelAnimationR();
 				wheelAnimationL();
+				tapeAnimationL();
+				tapeAnimationR();
 			}
 
 			function stopWheelAnimation() {
 				wheelL.stop();
 				wheelR.stop();
+				tapeL.stop();
+				tapeR.stop();
 			}
 
 			function recStop() {
@@ -128,7 +145,7 @@
 
 			 		//console.log(playActive);
 
-					if (!xRec) { // is stopped or paused
+					if (!xRec) { // is not recording
 						wheelAnimation();
 			 		}
 					playPause.transform('t169.344053, ' + buttonYpositionActive);
@@ -244,13 +261,13 @@
 				//__log('Input connected to audio context destination.');
 
 				recorder = new Recorder(input);
-				__log('Recorder initialised.');
+				__log('Ready!');
 			}
 
 			// rec function
 			rec.click(function() {
 
-				if (!xRec){ //start recording
+				if (!xRec){ //is not recording
 
 					rec.transform('t0.344053, ' + buttonYpositionActive);
 
