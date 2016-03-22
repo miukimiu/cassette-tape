@@ -42,8 +42,8 @@
 				this.play();
 			}, false);
 
-			audio.addEventListener("timeupdate", function(){ timeUpdate(); });
-			audio.addEventListener("loadedmetadata", function(){ timeDurUpdate(); });
+			//audio.addEventListener("timeupdate", function(){ timeUpdate(); });
+			//audio.addEventListener("loadedmetadata", function(){ timeDurUpdate(); });
 			audio.addEventListener("tracktitle", function(){ titleUpdate(); });
 
 			//audio.addEventListener("ended", function(){ nextTrack(); });
@@ -59,9 +59,9 @@
 			}
 			// wheel animation right
 			function wheelAnimationR() {
-				wheelR.animate({ cx: 'r-360,270,30'}, 2000,
+				wheelR.animate({ transform: 'r-360,270,30'}, 2000,
 					function(){
-							wheelR.attr({ cx: 'rotate(0 270 30)'});
+							wheelR.attr({ transform: 'rotate(0 270 30)'});
 							wheelAnimationR();
 						}
 				);
