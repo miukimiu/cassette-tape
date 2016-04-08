@@ -293,7 +293,7 @@
 
 					recorder && recorder.stop();
 
-					__log('Stopped rec.');
+					__log('Stopped recording.');
 
 					// create WAV download link using audio data blob
 					createDownloadLink();
