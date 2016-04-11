@@ -340,8 +340,9 @@
 				});
 			};
 
+			// *************** ok
 			function setup() {
-			  createCanvas(710, 400);
+			  createCanvas(windowWidth, 400);
 
 			  // Create an Audio input
 			  mic = new p5.AudioIn();
@@ -352,18 +353,17 @@
 			}
 
 			function draw() {
-			  background(200);
-
-				fill(555);
 
 			  // Get the overall volume (between 0 and 1.0)
 			  var vol = mic.getLevel();
+				vol = vol;
 
-				console.log(vol);
+				console.log('vol: ' + (vol * 1000));
 
-				background(51);
+				background(255, 255, 255);
+				stroke(255, 255, 255);
+				fill(25, 202, 144);
 
-				fill(255);
 				// We are going to draw a polygon out of the wave points
 				beginShape();
 
@@ -374,16 +374,21 @@
 					// Calculate a y value according to noise, map to
 
 					// Option #1: 2D Noise
-					var y = map(noise(xoff, yoff), 0, 1, 200,300);
+					//map(value,start1,stop1,start2,stop2)
+					var y = map(noise(xoff, yoff), 0, 1, 100,350);
 
 					// Set the vertex
 					vertex(x, y);
 					// Increment x dimension for noise
-					xoff += (0.05 + vol);
+					xoff += (vol);
 				}
 				// increment y dimension for noise
-				yoff += (0.1 + vol);
+				yoff += (vol);
 				vertex(width, height);
 				vertex(0, height);
 				endShape(CLOSE);
+			}
+
+			function windowResized() {
+			  resizeCanvas(windowWidth, 400);
 			}
