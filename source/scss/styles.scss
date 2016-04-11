@@ -1,8 +1,8 @@
+@import "base/reset";
 // variables
 $green: rgb(25, 202, 144);
 
 .wrap {
-  max-width: 1140px;
   margin: 0 auto;
   height: 500px;
   position: relative;
@@ -30,5 +30,5 @@ $green: rgb(25, 202, 144);
   background: $green;
   min-height: 200px;
   position: relative;
-  
+
 }

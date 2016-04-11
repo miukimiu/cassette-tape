@@ -373,7 +373,7 @@
 
 					// Option #1: 2D Noise
 					//map(value,start1,stop1,start2,stop2)
-					var y = map(noise(xoff, yoff), 0, 1, 100,350);
+					var y = map(noise(xoff, yoff), 0, 1, 100,400);
 
 					// Set the vertex
 					vertex(x, y);
@@ -385,8 +385,4 @@
 				vertex(width, height);
 				vertex(0, height);
 				endShape(CLOSE);
-			}
-
-			function windowResized() {
-			  resizeCanvas(windowWidth, 400);
 			}
