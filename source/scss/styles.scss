@@ -1,13 +1,34 @@
+// variables
+$green: rgb(25, 202, 144);
+
 .wrap {
   max-width: 1140px;
   margin: 0 auto;
+  height: 500px;
+  position: relative;
 }
 
 .main {
-    padding-top: 40px;
-    
+  padding-top: 40px;
+
 	svg {
         display: block;
         margin: 0 auto;
+        position: relative;
+        z-index: 100;
     }
+}
+
+#defaultCanvas0 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.recordings {
+  background: $green;
+  min-height: 200px;
+  position: relative;
+  
 }

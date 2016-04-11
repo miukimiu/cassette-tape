@@ -101,7 +101,7 @@
 			}
 
 			function recStop() {
-			  	rec.transform('t0.344053, ' + buttonYposition);
+			  rec.transform('t0.344053, ' + buttonYposition);
 				xRec = false;
 			}
 
@@ -342,13 +342,12 @@
 
 			// *************** ok
 			function setup() {
-			  createCanvas(windowWidth, 400);
+			  createCanvas(windowWidth, 500);
 
 			  // Create an Audio input
 			  mic = new p5.AudioIn();
 
 			  // start the Audio Input.
-			  // By default, it does not .connect() (to the computer speakers)
 			  mic.start();
 			}
 
@@ -356,12 +355,11 @@
 
 			  // Get the overall volume (between 0 and 1.0)
 			  var vol = mic.getLevel();
-				vol = vol;
 
-				console.log('vol: ' + (vol * 1000));
+				console.log('vol: ' + vol);
 
 				background(255, 255, 255);
-				stroke(255, 255, 255);
+				stroke(25, 202, 144);
 				fill(25, 202, 144);
 
 				// We are going to draw a polygon out of the wave points
@@ -380,10 +378,10 @@
 					// Set the vertex
 					vertex(x, y);
 					// Increment x dimension for noise
-					xoff += (vol);
+					xoff += vol;
 				}
 				// increment y dimension for noise
-				yoff += (vol);
+				yoff += vol;
 				vertex(width, height);
 				vertex(0, height);
 				endShape(CLOSE);
