@@ -1,9 +1,18 @@
 @import "base/reset";
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300);
 
 // variables
 $green: rgb(25, 202, 144);
-$gray-dark: #424242;
+$gray-dark: #495866;
+$gray-cassette: #2F3B46;
+$gray-light: #E8E9E9;
+$pink: #E83B4E;
+$yellow: #DB9845;
+$white: #ffffff;
 
+body {
+  font-family: 'Open Sans', sans-serif;
+}
 .cassete-player {
   padding-top: 40px + 60px;
 
@@ -23,11 +32,21 @@ $gray-dark: #424242;
   z-index: 10;
 }
 
-.recordings {
-  background: $green;
-  min-height: 200px;
+.hero {
   position: relative;
+  min-height: 200px;
+  background: $green;
+  z-index: 100;
 
+  &__grid {
+    max-width: 800px;
+  }
+  &__title {
+    color: $white;
+    font-size: 26px;
+    line-height: 36px;
+    font-weight: 300;
+  }
 }
 
 .mdl-layout--fixed-header {
@@ -38,6 +57,25 @@ $gray-dark: #424242;
   color: black;
 
   .mdl-navigation__link {
-      color: $gray-dark;
+    color: $gray-dark;
   }
+}
+.mdl-list {
+  padding: 40px 0;
+
+  &__item {
+    background: $gray-light;
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+}
+.mdl-list__item-icon.material-icons {
+  //color: $white;
+}
+.mdl-list__item-avatar.material-icons {
+  background: $white;
+  color: $pink;
+}
+.mdl-button--fab.mdl-button--colored {
+  //background: $pink;
 }
