@@ -352,7 +352,7 @@ angular.module('cassetteApp', [])
         __log('Audio context set up.');
         __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
       } catch (e) {
-        alert('No web audio support in this browser!');
+        __log('Just work in chrome!');
       }
 
       navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
@@ -415,7 +415,7 @@ angular.module('cassetteApp', [])
 
           // Option #1: 2D Noise
           //map(value,start1,stop1,start2,stop2)
-          var y = noiseWave.map(noiseWave.noise(xoff, yoff), 0, 1, 100,400);
+          var y = noiseWave.map(noiseWave.noise(xoff, yoff), 0, 1, 200,300);
 
           // Set the vertex
           noiseWave.vertex(x, y);
