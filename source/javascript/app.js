@@ -311,14 +311,19 @@ angular.module('cassetteApp', [])
         var au = document.createElement('audio');
         var hf = document.createElement('a');
 
+
         au.controls = true;
         au.src = url;
         hf.href = url;
         hf.download = new Date().toISOString() + '.wav';
         hf.innerHTML = hf.download;
         //li.appendChild(au); // I don't want the default browser player.
+
+
         li.appendChild(hf); // i just want the link of the recorded audio to download
+
         recordingslist.appendChild(li);
+
       });
     }
 
