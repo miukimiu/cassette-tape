@@ -342,7 +342,9 @@
 
 			// *************** ok
 			function setup() {
-			  createCanvas(windowWidth, 500);
+			  canvas = createCanvas(windowWidth, 500);
+
+				canvas.parent('cassete-player-ct');
 
 			  // Create an Audio input
 			  mic = new p5.AudioIn();

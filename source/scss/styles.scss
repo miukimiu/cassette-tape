@@ -1,21 +1,18 @@
 @import "base/reset";
+
 // variables
 $green: rgb(25, 202, 144);
+$gray-dark: #424242;
 
-.wrap {
-  margin: 0 auto;
-  height: 500px;
-  position: relative;
-}
-
-.main {
-  padding-top: 40px;
+.cassete-player {
+  padding-top: 40px + 60px;
 
 	svg {
         display: block;
         margin: 0 auto;
         position: relative;
         z-index: 100;
+        margin-top: -40px;
     }
 }
 
@@ -31,4 +28,16 @@ $green: rgb(25, 202, 144);
   min-height: 200px;
   position: relative;
 
+}
+
+.mdl-layout--fixed-header {
+  z-index: 1000;
+}
+.mdl-layout__header {
+  background: white;
+  color: black;
+
+  .mdl-navigation__link {
+      color: $gray-dark;
+  }
 }
