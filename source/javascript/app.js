@@ -1,7 +1,4 @@
 angular.module('cassetteApp', [])
-.config(['$compileProvider', function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/);
-}])
 
 .controller('cassetteController', function($scope, $window){
 
