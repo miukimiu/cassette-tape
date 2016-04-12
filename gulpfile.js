@@ -98,3 +98,5 @@ gulp.task('watch', function() {
 
 /* run the watch task when gulp is called without arguments */
 gulp.task('default', ['browser-sync', 'watch']);
+
+gulp.task('build', ['build-js', 'build-vendorjs', 'build-css', 'build-html', 'jshint']);
