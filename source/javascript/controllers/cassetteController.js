@@ -1,4 +1,3 @@
-angular.module('cassetteApp', [])
 .controller('cassetteController', function($scope){
 
   var rec = Snap('#rec'),
@@ -341,67 +340,58 @@ angular.module('cassetteApp', [])
       });
     };
 
-    var sketch = function(noiseWave) {
+    // p5 functions
+    // ***************
 
-      var url;
-  		var myCanvas;
-  		var counter = 0;
-  		var startingAngle=7;
-  		var goRight = true;
-  		var startUp = true;
-  		var myFrameRate = 30;
-  		var running = true;
+    function setup() {
+      canvas = createCanvas(windowWidth, 500);
 
-      noiseWave.setup = function() {
+      canvas.parent('cassete-player-ct');
 
-        myCanvas = noiseWave.createCanvas(screen.width, 500);
-        myCanvas.parent('cassete-player-ct');
+      // Create an Audio input
+      mic = new p5.AudioIn();
 
-        // Create an Audio input
-        mic = new p5.AudioIn();
+      // start the Audio Input.
+      mic.start();
+    }
 
-        // start the Audio Input.
-        mic.start();
-      };
+    function draw() {
 
-      noiseWave.draw = function() {
+      var yoff = 0.0;
+      // Get the overall volume (between 0 and 1.0)
+      var vol = mic.getLevel();
 
-        var yoff = 0.0;
-        // Get the overall volume (between 0 and 1.0)
-        var vol = mic.getLevel();
+      //console.log('vol: ' + vol);
 
-        //console.log('vol: ' + vol);
+      background(255, 255, 255);
+      stroke(25, 202, 144);
+      fill(25, 202, 144);
 
-        noiseWave.background(255, 255, 255);
-        noiseWave.stroke(25, 202, 144);
-        noiseWave.fill(25, 202, 144);
+      // We are going to draw a polygon out of the wave points
+      beginShape();
 
-        // We are going to draw a polygon out of the wave points
-        noiseWave.beginShape();
+      var xoff = 0;       // Option #1: 2D Noise
 
-        var xoff = 0;       // Option #1: 2D Noise
+      // Iterate over horizontal pixels
+      for (var x = 0; x <= width; x += 10) {
+        // Calculate a y value according to noise, map to
 
-        // Iterate over horizontal pixels
-        for (var x = 0; x <= screen.width; x += 10) {
-          // Calculate a y value according to noise, map to
+        // Option #1: 2D Noise
+        //map(value,start1,stop1,start2,stop2)
+        var y = map(noise(xoff, yoff), 0, 1, 100,400);
 
-          // Option #1: 2D Noise
-          //map(value,start1,stop1,start2,stop2)
-          var y = noiseWave.map(noiseWave.noise(xoff, yoff), 0, 1, 100,400);
+        // Set the vertex
+        vertex(x, y);
+        // Increment x dimension for noise
+        xoff += vol;
+      }
+      // increment y dimension for noise
+      yoff += vol;
+      vertex(width, height);
+      vertex(0, height);
+      endShape(CLOSE);
+    }
 
-          // Set the vertex
-          noiseWave.vertex(x, y);
-          // Increment x dimension for noise
-          xoff += vol;
-        }
-        // increment y dimension for noise
-        yoff += vol;
-        noiseWave.vertex(screen.width, screen.height);
-        noiseWave.vertex(0, screen.height);
-        noiseWave.endShape(noiseWave.CLOSE);
-      };
-    };
 
-    var myP5 = new p5(sketch);
 
 });
