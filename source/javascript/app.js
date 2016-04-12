@@ -1,5 +1,9 @@
 angular.module('cassetteApp', [])
-.controller('cassetteController', function($scope){
+.config(['$compileProvider', function ($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/);
+}])
+
+.controller('cassetteController', function($scope, $window){
 
   var rec = Snap('#rec'),
     xRec = false,
@@ -33,6 +37,8 @@ angular.module('cassetteApp', [])
     audio_context,
     recorder,
     seekto;
+
+    var mic, soundFile;
 
     pauseState.attr("display", "none");
 
@@ -266,7 +272,7 @@ angular.module('cassetteApp', [])
     }
 
     // rec function
-    rec.click(function() {
+    rec.click(function(ok) {
 
       if (!xRec){ //is not recording
 
@@ -304,6 +310,7 @@ angular.module('cassetteApp', [])
     });
     // end rec function
 
+
     function createDownloadLink() {
       recorder && recorder.exportWAV(function(blob) {
         var url = URL.createObjectURL(blob);
@@ -320,10 +327,17 @@ angular.module('cassetteApp', [])
         //li.appendChild(au); // I don't want the default browser player.
 
 
+        var trackURL = hf.download;
+
+        console.log(url);
         li.appendChild(hf); // i just want the link of the recorded audio to download
 
-        recordingslist.appendChild(li);
+        //recordingslist.appendChild(li);
 
+
+        var myElement = angular.element('<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + trackURL + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
+
+        angular.element(document.querySelector('#recordingslist')).append(myElement);
       });
     }
 
@@ -367,6 +381,15 @@ angular.module('cassetteApp', [])
 
         // start the Audio Input.
         mic.start();
+
+        // create a sound recorder
+        recorder = new p5.SoundRecorder();
+
+        // connect the mic to the recorder
+        recorder.setInput(mic);
+
+        // create an empty sound file that we will use to playback the recording
+        soundFile = new p5.SoundFile();
       };
 
       noiseWave.draw = function() {
@@ -405,8 +428,11 @@ angular.module('cassetteApp', [])
         noiseWave.vertex(0, screen.height);
         noiseWave.endShape(noiseWave.CLOSE);
       };
-    };
+
+    };// var sketch
 
     var myP5 = new p5(sketch);
+
+
 
 });

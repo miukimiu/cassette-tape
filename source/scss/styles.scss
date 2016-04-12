@@ -9,6 +9,7 @@ $gray-light: #E8E9E9;
 $pink: #E83B4E;
 $yellow: #DB9845;
 $white: #ffffff;
+$vertical-space: 40px;
 
 body {
   font-family: 'Open Sans', sans-serif;
@@ -17,12 +18,12 @@ body {
   padding-top: 40px + 60px;
 
 	svg {
-        display: block;
-        margin: 0 auto;
-        position: relative;
-        z-index: 100;
-        margin-top: -40px;
-    }
+      display: block;
+      margin: 0 auto;
+      position: relative;
+      z-index: 100;
+      margin-top: -40px;
+  }
 }
 
 #defaultCanvas0 {
@@ -38,9 +39,6 @@ body {
   background: $green;
   z-index: 100;
 
-  &__grid {
-    max-width: 800px;
-  }
   &__title {
     color: $white;
     font-size: 26px;
@@ -48,7 +46,9 @@ body {
     font-weight: 300;
   }
 }
-
+.cassete-player__grid {
+  max-width: 800px;
+}
 .mdl-layout--fixed-header {
   z-index: 1000;
 }
@@ -61,7 +61,7 @@ body {
   }
 }
 .mdl-list {
-  padding: 40px 0;
+  padding: 20px 0 40px;
 
   &__item {
     background: $gray-light;
@@ -78,4 +78,8 @@ body {
 }
 .mdl-button--fab.mdl-button--colored {
   //background: $pink;
+}
+
+.about {
+  padding: $vertical-space 0;
 }

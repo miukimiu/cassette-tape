@@ -24,7 +24,8 @@
           <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation mdl-layout--large-screen-only">
-            <a class="mdl-navigation__link" href="">About</a>
+            <a class="mdl-navigation__link" href="#about">About</a>
+            <a class="mdl-navigation__link" href="https://github.com/miukimiu/cassette-player">Github</a>
           </nav>
         </div>
       </header>
@@ -182,48 +183,46 @@
           </div>
           <!-- / cassete-player -->
 
-
           <div class="hero">
 
-            <div class="hero__grid mdl-grid">
+            <div class="cassete-player__grid mdl-grid">
 
               <div class="mdl-cell mdl-cell--12-col">
 
                 <h2 class="hero__title">Don’t be shy! Press play. Let the loop play! When you’re ready press rec and record your freestyle!</h2>
-
               </div>
               <!-- mdl-cell -->
             </div>
-          </div>
-          <!-- / .recordings -->
 
-          <div class="recordings-list">
-            <div class="hero__grid mdl-grid">
-              <div class="mdl-cell mdl-cell--12-col">
-                <ul class="demo-list-control mdl-list" id="recordingslist">
-                  <li class="mdl-list__item">
-                    <span class="mdl-list__item-primary-content">
-                      <i class="material-icons mdl-list__item-icon">audiotrack</i>
-                      Audio track 1
-                    </span>
-                    <span class="mdl-list__item-secondary-action">
-                      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored">
-                        <i class="material-icons">file_download</i>
-                      </button>
-                    </span>
-                  </li>
-                </ul>
+            <div class="recordings-list">
+              <div class="cassete-player__grid mdl-grid">
+                <div class="mdl-cell mdl-cell--12-col">
+                  <ul class="demo-list-control mdl-list" id="recordingslist">
+                  </ul>
+                </div>
               </div>
+            </div>
+            <!-- / .recordings-list -->
+          </div>
+          <!-- / .hero -->
+
+          <div id="about" class="about">
+            <div class="cassete-player__grid mdl-grid">
+              <p>
+                Lorem ipsum
+              </p>
             </div>
           </div>
         </div>
+        <!-- / .page-content -->
 
         <footer class="mdl-mini-footer">
           <div class="mdl-mini-footer__left-section">
             <div class="mdl-logo">CASSETE TAPE</div>
+          </div>
+          <div class="mdl-mini-footer__right-section">
             <ul class="mdl-mini-footer__link-list">
-              <li><a href="#">Help</a></li>
-              <li><a href="#">Privacy & Terms</a></li>
+              <li><a href="https://github.com/miukimiu/cassette-player">Github</a></li>
             </ul>
           </div>
         </footer>
