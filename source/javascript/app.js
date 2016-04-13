@@ -27,30 +27,25 @@ angular.module('cassetteApp', [])
     dir = "audio/",
     ext = ".mp3",
     input,
-    analyzer,
     currentTrack = 0,
-    seekslider,
-    seeking=false,
     audio_context,
     recorder,
-    seekto;
-
-    var mic, soundFile;
+    mic,
+    soundFile;
 
     pauseState.attr("display", "none");
 
     // Audio Object
     audio.src = dir+playlist[0]+ext;
 
-    seekslider = document.getElementById("seekslider");
-
     audio.addEventListener('ended', function() {
       this.currentTime = 0;
       this.play();
     }, false);
 
-
-    audio.addEventListener("tracktitle", function(){ titleUpdate(); });
+    audio.addEventListener("tracktitle", function(){
+      titleUpdate();
+    });
 
     // wheel animation left
     function wheelAnimationL() {
@@ -130,9 +125,7 @@ angular.module('cassetteApp', [])
 
       titleUpdate();
 
-
       audio.play();
-
     }
 
     // play function
@@ -141,13 +134,10 @@ angular.module('cassetteApp', [])
       if(audio.paused) {
 
         // play state
-
         playActive = true;
 
         playState.attr("display", "none");
         pauseState.attr("display", "block");
-
-        //console.log(playActive);
 
         if (!xRec) { // is not recording
           wheelAnimation();
@@ -163,14 +153,10 @@ angular.module('cassetteApp', [])
         } else {
 
           // pause state
-
           playActive = false;
 
           pauseState.attr("display", "none");
           playState.attr("display", "block");
-
-          //console.log(playActive);
-
           audio.pause();
 
           if (!xRec) { // is stopped or paused
@@ -196,13 +182,9 @@ angular.module('cassetteApp', [])
       anim1();
 
       if(currentTrack > 0 ) {
-
         currentTrack--;
-
       } else {
-
           currentTrack = (playlist.length - 1);
-
       }
 
       audio.src = dir+playlist[currentTrack]+ext;
@@ -233,10 +215,8 @@ angular.module('cassetteApp', [])
       if(currentTrack == (playlist.length - 1)){
         currentTrack = 0;
       } else {
-          currentTrack++;
+        currentTrack++;
       }
-
-      //console.log('fw - the current track is: ' + currentTrack);
 
       audio.src = dir+playlist[currentTrack]+ext;
 
@@ -259,10 +239,7 @@ angular.module('cassetteApp', [])
 
     function startUserMedia(stream) {
       var input = audio_context.createMediaStreamSource(stream);
-      __log('Media stream created.');
-      // Uncomment if you want the audio to feedback directly
-      //input.connect(audio_context.destination);
-      //__log('Input connected to audio context destination.');
+      console.log('Media stream created.');
 
       recorder = new Recorder(input);
       __log('Ready!');
@@ -275,8 +252,6 @@ angular.module('cassetteApp', [])
 
         rec.transform('t0.344053, ' + buttonYpositionActive);
 
-        // wheels events
-
         if (!playActive) { // is stopped or paused
           wheelAnimation();
         }
@@ -288,6 +263,7 @@ angular.module('cassetteApp', [])
         __log('Recording...');
 
       }  else { //stop recording
+
         recStop();
 
         if (!playActive) { // is stopped or paused
@@ -297,7 +273,7 @@ angular.module('cassetteApp', [])
 
         recorder && recorder.stop();
 
-        __log('Stopped recording.');
+        __log('Stopped rec.');
 
         // create WAV download link using audio data blob
         createDownloadLink();
@@ -306,7 +282,6 @@ angular.module('cassetteApp', [])
       }
     });
     // end rec function
-
 
     function createDownloadLink() {
       recorder && recorder.exportWAV(function(blob) {
@@ -321,20 +296,12 @@ angular.module('cassetteApp', [])
         hf.href = url;
         hf.download = new Date().toISOString() + '.wav';
         hf.innerHTML = hf.download;
-        //li.appendChild(au); // I don't want the default browser player.
-
 
         var trackURL = hf.download;
 
-        console.log(url);
-        li.appendChild(hf); // i just want the link of the recorded audio to download
+        var recordingElement = angular.element('<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + trackURL + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
 
-        //recordingslist.appendChild(li);
-
-
-        var myElement = angular.element('<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + trackURL + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
-
-        angular.element(document.querySelector('#recordingslist')).append(myElement);
+        angular.element(document.querySelector('#recordingslist')).append(recordingElement);
       });
     }
 
@@ -346,10 +313,10 @@ angular.module('cassetteApp', [])
         window.URL = window.URL || window.webkitURL;
 
         audio_context = new AudioContext;
-        __log('Audio context set up.');
-        __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+        //console.log(('Audio context set up.');
+        //console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
       } catch (e) {
-        __log('Just work in chrome!');
+        __log('Just work on chrome!');
       }
 
       navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
@@ -359,14 +326,14 @@ angular.module('cassetteApp', [])
 
     var sketch = function(noiseWave) {
 
-      var url;
-  		var myCanvas;
-  		var counter = 0;
-  		var startingAngle=7;
-  		var goRight = true;
-  		var startUp = true;
-  		var myFrameRate = 30;
-  		var running = true;
+      var url,
+    		myCanvas,
+    		counter = 0,
+    		startingAngle=7,
+    		goRight = true,
+    		startUp = true,
+    		myFrameRate = 30,
+    		running = true;
 
       noiseWave.setup = function() {
 
@@ -395,8 +362,6 @@ angular.module('cassetteApp', [])
         // Get the overall volume (between 0 and 1.0)
         var vol = mic.getLevel();
 
-        //console.log('vol: ' + vol);
-
         noiseWave.background(255, 255, 255);
         noiseWave.stroke(25, 202, 144);
         noiseWave.fill(25, 202, 144);
@@ -410,7 +375,6 @@ angular.module('cassetteApp', [])
         for (var x = 0; x <= screen.width; x += 10) {
           // Calculate a y value according to noise, map to
 
-          // Option #1: 2D Noise
           //map(value,start1,stop1,start2,stop2)
           var y = noiseWave.map(noiseWave.noise(xoff, yoff), 0, 1, 200,300);
 
@@ -429,7 +393,5 @@ angular.module('cassetteApp', [])
     };// var sketch
 
     var myP5 = new p5(sketch);
-
-
 
 });
