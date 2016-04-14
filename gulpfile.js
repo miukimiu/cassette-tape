@@ -9,9 +9,9 @@ var gulp  = require('gulp'),
 
     input  = {
       'sass': 'source/scss/**/*.scss',
-      'javascript': 'source/javascript/*.js',
+      'javascript': ['source/javascript/*.js'],
       'vendorjs': 'source/javascript/vendor/*.js',
-      'html': 'source/*.html',
+      'html': ['source/*.html', 'source/*/*.html'],
       'audio': 'source/audio/*.mp3'
     },
 

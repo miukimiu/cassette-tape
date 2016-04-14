@@ -1,4 +1,15 @@
-.controller('cassetteController', function($scope){
+'use strict';
+
+/**
+ * @ngdoc function
+ * @name cassetteApp.controller:CassetteController
+ * @description
+ * # CassetteController
+ * Controller of the cassetteApp
+ */
+
+angular.module('cassetteApp')
+.controller('CassetteController', function($scope, $window) {
 
   var rec = Snap('#rec'),
     xRec = false,
@@ -25,28 +36,25 @@
     dir = "audio/",
     ext = ".mp3",
     input,
-    analyzer,
     currentTrack = 0,
-    seekslider,
-    seeking=false,
     audio_context,
     recorder,
-    seekto;
+    mic,
+    soundFile;
 
     pauseState.attr("display", "none");
 
     // Audio Object
     audio.src = dir+playlist[0]+ext;
 
-    seekslider = document.getElementById("seekslider");
-
     audio.addEventListener('ended', function() {
       this.currentTime = 0;
       this.play();
     }, false);
 
-
-    audio.addEventListener("tracktitle", function(){ titleUpdate(); });
+    audio.addEventListener("tracktitle", function(){
+      titleUpdate();
+    });
 
     // wheel animation left
     function wheelAnimationL() {
@@ -126,9 +134,7 @@
 
       titleUpdate();
 
-
       audio.play();
-
     }
 
     // play function
@@ -137,13 +143,10 @@
       if(audio.paused) {
 
         // play state
-
         playActive = true;
 
         playState.attr("display", "none");
         pauseState.attr("display", "block");
-
-        //console.log(playActive);
 
         if (!xRec) { // is not recording
           wheelAnimation();
@@ -159,14 +162,10 @@
         } else {
 
           // pause state
-
           playActive = false;
 
           pauseState.attr("display", "none");
           playState.attr("display", "block");
-
-          //console.log(playActive);
-
           audio.pause();
 
           if (!xRec) { // is stopped or paused
@@ -192,13 +191,9 @@
       anim1();
 
       if(currentTrack > 0 ) {
-
         currentTrack--;
-
       } else {
-
           currentTrack = (playlist.length - 1);
-
       }
 
       audio.src = dir+playlist[currentTrack]+ext;
@@ -229,10 +224,8 @@
       if(currentTrack == (playlist.length - 1)){
         currentTrack = 0;
       } else {
-          currentTrack++;
+        currentTrack++;
       }
-
-      //console.log('fw - the current track is: ' + currentTrack);
 
       audio.src = dir+playlist[currentTrack]+ext;
 
@@ -255,23 +248,18 @@
 
     function startUserMedia(stream) {
       var input = audio_context.createMediaStreamSource(stream);
-      __log('Media stream created.');
-      // Uncomment if you want the audio to feedback directly
-      //input.connect(audio_context.destination);
-      //__log('Input connected to audio context destination.');
+      console.log('Media stream created.');
 
       recorder = new Recorder(input);
       __log('Ready!');
     }
 
     // rec function
-    rec.click(function() {
+    rec.click(function(ok) {
 
       if (!xRec){ //is not recording
 
         rec.transform('t0.344053, ' + buttonYpositionActive);
-
-        // wheels events
 
         if (!playActive) { // is stopped or paused
           wheelAnimation();
@@ -284,6 +272,7 @@
         __log('Recording...');
 
       }  else { //stop recording
+
         recStop();
 
         if (!playActive) { // is stopped or paused
@@ -293,7 +282,7 @@
 
         recorder && recorder.stop();
 
-        __log('Stopped recording.');
+        __log('Stopped rec.');
 
         // create WAV download link using audio data blob
         createDownloadLink();
@@ -310,14 +299,18 @@
         var au = document.createElement('audio');
         var hf = document.createElement('a');
 
+
         au.controls = true;
         au.src = url;
         hf.href = url;
         hf.download = new Date().toISOString() + '.wav';
         hf.innerHTML = hf.download;
-        //li.appendChild(au); // I don't want the default browser player.
-        li.appendChild(hf); // i just want the link of the recorded audio to download
-        recordingslist.appendChild(li);
+
+        var trackURL = hf.download;
+
+        var recordingElement = angular.element('<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + trackURL + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
+
+        angular.element(document.querySelector('#recordingslist')).append(recordingElement);
       });
     }
 
@@ -329,10 +322,10 @@
         window.URL = window.URL || window.webkitURL;
 
         audio_context = new AudioContext;
-        __log('Audio context set up.');
-        __log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+        //console.log(('Audio context set up.');
+        //console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
       } catch (e) {
-        alert('No web audio support in this browser!');
+        __log('Just work on chrome!');
       }
 
       navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
@@ -340,58 +333,74 @@
       });
     };
 
-    // p5 functions
-    // ***************
+    var sketch = function(noiseWave) {
 
-    function setup() {
-      canvas = createCanvas(windowWidth, 500);
+      var url,
+    		myCanvas,
+    		counter = 0,
+    		startingAngle=7,
+    		goRight = true,
+    		startUp = true,
+    		myFrameRate = 30,
+    		running = true;
 
-      canvas.parent('cassete-player-ct');
+      noiseWave.setup = function() {
 
-      // Create an Audio input
-      mic = new p5.AudioIn();
+        myCanvas = noiseWave.createCanvas(screen.width, 500);
+        myCanvas.parent('cassete-player-ct');
 
-      // start the Audio Input.
-      mic.start();
-    }
+        // Create an Audio input
+        mic = new p5.AudioIn();
 
-    function draw() {
+        // start the Audio Input.
+        mic.start();
 
-      var yoff = 0.0;
-      // Get the overall volume (between 0 and 1.0)
-      var vol = mic.getLevel();
+        // create a sound recorder
+        recorder = new p5.SoundRecorder();
 
-      //console.log('vol: ' + vol);
+        // connect the mic to the recorder
+        recorder.setInput(mic);
 
-      background(255, 255, 255);
-      stroke(25, 202, 144);
-      fill(25, 202, 144);
+        // create an empty sound file that we will use to playback the recording
+        soundFile = new p5.SoundFile();
+      };
 
-      // We are going to draw a polygon out of the wave points
-      beginShape();
+      noiseWave.draw = function() {
 
-      var xoff = 0;       // Option #1: 2D Noise
+        var yoff = 0.0;
+        // Get the overall volume (between 0 and 1.0)
+        var vol = mic.getLevel();
 
-      // Iterate over horizontal pixels
-      for (var x = 0; x <= width; x += 10) {
-        // Calculate a y value according to noise, map to
+        noiseWave.background(255, 255, 255);
+        noiseWave.stroke(25, 202, 144);
+        noiseWave.fill(25, 202, 144);
 
-        // Option #1: 2D Noise
-        //map(value,start1,stop1,start2,stop2)
-        var y = map(noise(xoff, yoff), 0, 1, 100,400);
+        // We are going to draw a polygon out of the wave points
+        noiseWave.beginShape();
 
-        // Set the vertex
-        vertex(x, y);
-        // Increment x dimension for noise
-        xoff += vol;
-      }
-      // increment y dimension for noise
-      yoff += vol;
-      vertex(width, height);
-      vertex(0, height);
-      endShape(CLOSE);
-    }
+        var xoff = 0;       // Option #1: 2D Noise
 
+        // Iterate over horizontal pixels
+        for (var x = 0; x <= screen.width; x += 10) {
+          // Calculate a y value according to noise, map to
 
+          //map(value,start1,stop1,start2,stop2)
+          var y = noiseWave.map(noiseWave.noise(xoff, yoff), 0, 1, 200,300);
+
+          // Set the vertex
+          noiseWave.vertex(x, y);
+          // Increment x dimension for noise
+          xoff += vol;
+        }
+        // increment y dimension for noise
+        yoff += vol;
+        noiseWave.vertex(screen.width, screen.height);
+        noiseWave.vertex(0, screen.height);
+        noiseWave.endShape(noiseWave.CLOSE);
+      };
+
+    };// var sketch
+
+    var myP5 = new p5(sketch);
 
 });
