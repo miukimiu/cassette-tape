@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @ngdoc function
  * @name cassetteApp.controller:CassetteController
@@ -9,7 +7,7 @@
  */
 
 angular.module('cassetteApp')
-.controller('CassetteController', function($scope, $window) {
+.controller('CassetteController', function($scope, $window, $http) {
 
   var rec = Snap('#rec'),
     xRec = false,

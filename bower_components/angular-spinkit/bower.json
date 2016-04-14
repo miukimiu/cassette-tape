@@ -1,0 +1,33 @@
+{
+  "name": "angular-spinkit",
+  "version": "0.3.4",
+  "authors": [
+    "Urigo <uri.goldshtein@gmail.com>"
+  ],
+  "description": "SpinKit (https://github.com/tobiasahlin/SpinKit) spinners for AngularJS",
+  "main": ["./build/angular-spinkit.js", "./build/angular-spinkit.min.css"],
+  "keywords": [
+    "spinner",
+    "SpinKit",
+    "spinners",
+    "AngularJS",
+    "ngSpinKit",
+    "preloader",
+    "image spinner",
+    "image preloader",
+    "loading indicator"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Urigo",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "*"
+  }
+}

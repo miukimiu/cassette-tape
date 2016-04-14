@@ -83,3 +83,7 @@ body {
 .about {
   padding: $vertical-space 0;
 }
+
+.wave-spinner > div {
+  background-color: $green;
+}
