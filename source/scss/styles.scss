@@ -51,8 +51,12 @@ body {
     font-weight: 300;
   }
 }
-.cassete-player__grid {
+.mdl-grid {
   max-width: 800px;
+
+  &__padded {
+    padding: 100px 0;
+  }
 }
 .mdl-layout--fixed-header {
   z-index: 1000;
@@ -115,8 +119,13 @@ body {
 h2 {
   font-size: 24px;
   line-height: 34px;
+  padding-bottom: 20px;
 }
 p {
   font-size: 18px;
   line-height: 28px;
+}
+
+.technology {
+  background: $gray-light;
 }

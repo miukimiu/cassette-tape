@@ -322,9 +322,9 @@ $(function() {
 
 					audio_context = new AudioContext;
 					__log('Audio context set up.');
-					__log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+				//	__log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
 				} catch (e) {
-					alert('No web audio support in this browser!');
+					alert('No web audio support!');
 				}
 
 				navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
@@ -346,6 +346,7 @@ $(function() {
         noiseWave.setup = function() {
 
           myCanvas = noiseWave.createCanvas(screen.width, 500);
+
           myCanvas.parent('cassete-player-ct');
 
           // Create an Audio input
