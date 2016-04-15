@@ -10,7 +10,7 @@ Plugins and libraries in use:
 * [jQuery](https://jquery.com/)
 
 # Demo
-[Demo](https://miukimiu.github.io/cassette-player/)
+[Demo](https://miukimiu.github.io/cassette-tape/)
 
 ### Install gulp and Bower
 
