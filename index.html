@@ -31,6 +31,7 @@
           <!-- Navigation. We hide it in small screens. -->
           <nav class="mdl-navigation mdl-layout--large-screen-only">
             <a class="mdl-navigation__link" href="#about">About</a>
+            <a class="mdl-navigation__link" href="#technology">Technology</a>
             <a class="mdl-navigation__link" href="https://github.com/miukimiu/cassette-player">Github</a>
           </nav>
         </div>
@@ -186,38 +187,83 @@
           </div>
           <!-- / cassete-player -->
 
-          <div class="hero">
-
-            <div class="cassete-player__grid mdl-grid">
-
-              <div class="mdl-cell mdl-cell--12-col">
-
-                <h2 class="hero__title">Don’t be shy! Press play. Let the loop play! When you’re ready press rec and record your freestyle!</h2>
-
-              </div>
-              <!-- mdl-cell -->
-            </div>
-
-            <div class="recordings-list">
+            <div class="hero">
               <div class="cassete-player__grid mdl-grid">
+
                 <div class="mdl-cell mdl-cell--12-col">
-                  <ul class="demo-list-control mdl-list" id="recordingslist">
-                  </ul>
+
+                  <h2 class="hero__title">Don’t be shy! Press play. Let the loop play! When you’re ready press rec and record your freestyle!</h2>
+
+                </div>
+                <!-- mdl-cell -->
+              </div>
+
+              <div class="recordings-list">
+                <div class="cassete-player__grid mdl-grid">
+                  <div class="mdl-cell mdl-cell--12-col">
+                    <ul class="demo-list-control mdl-list" id="recordingslist">
+                    </ul>
+                  </div>
                 </div>
               </div>
+              <!-- / .recordings-list -->
             </div>
-            <!-- / .recordings-list -->
-          </div>
-          <!-- / .hero -->
+            <!-- / .hero -->
+
 
           <div id="about" class="about">
-            <div class="cassete-player__grid mdl-grid">
+            <div class="mdl-grid__padded mdl-grid">
               <h2>About</h2>
               <p>
-                Cassette Tape lets you record you freestyle on the browser. You just need to press play to listen to the hiphop loop and when you feel ready just press rec and it starts recording you voice. After that a wav file with your freestyle is generated and you just need to save into your computer.
+                Cassette Tape lets you record you freestyle on the browser. You just need to press play to listen to the hiphop loop and when you feel ready just press rec and it starts recording your voice. After that a wav file with your freestyle is generated and you can save it into your computer.
+
+                This web app only works in Chrome and firefox.
               </p>
             </div>
           </div>
+          <!-- / .about -->
+
+          <div class="technology" id="technology">
+
+            <div class="mdl-grid mdl-grid__padded">
+              
+              <div class="mdl-cell mdl-cell--12-col">
+                <h2>Technology</h2>
+              </div>
+
+              <div class="mdl-cell mdl-cell--6-col">
+
+                <ul class="mdl-list">
+                  <li class="mdl-list__item">
+                    <a href="https://www.google.com/chrome/" target="_blank">Chrome</a>
+                  </li>
+                  <li class="mdl-list__item">
+                    <a href="https://p5js.org/" target="_blank">p5.js</a>
+                  </li>
+                  <li class="mdl-list__item">
+                    <a href="https://en.wikipedia.org/wiki/HTML5_Audio#Web_Audio_API_and_MediaStream_Processing_API">Web Audio API</a>
+                  </li>
+                </ul>
+
+              </div>
+              <!-- mdl-cell -->
+
+              <div class="mdl-cell mdl-cell--6-col">
+                <li class="mdl-list__item">
+                  <a href="http://snapsvg.io/" target="_blank">Snap.svg</a>
+                </li>
+                <li class="mdl-list__item">
+                  <a href="https://github.com/mattdiamond/Recorderjs" target="_blank">Recorder.js</a>
+                </li>
+                <li class="mdl-list__item">
+                  <a href="https://jquery.com/" target="_blank">jQuery</a>
+                </li>
+              </div>
+              <!-- mdl-cell -->
+            </div>
+          </div>
+          <!-- / .technologies -->
+
         </div>
         <!-- / .page-content -->
 
@@ -231,8 +277,8 @@
             </ul>
           </div>
         </footer>
-
       </main>
+
     </div>
     <!-- mdl-layout -->
 
@@ -243,7 +289,7 @@
     <script src="assets/javascript/vendor/recorder.js"></script>
     <script   src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.0/jquery.scrollTo.min.js"></script>
-    <script src="assets/javascript/ok.js"></script>
+    <script src="assets/javascript/main.js"></script>
 
   </body>
 </html>
