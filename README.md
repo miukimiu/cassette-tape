@@ -1,6 +1,6 @@
 # Cassette Tape
 
-Cassete Tape is a html 5 hiphop drum loop player and voice recorder. Perfect to record your freestyles in a window browser.
+Cassete Tape is a html 5 hiphop drum loop player and voice recorder. Perfect to record a freestyle in a window browser.
 
 Plugins and libraries in use:
 
