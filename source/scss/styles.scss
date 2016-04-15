@@ -92,3 +92,31 @@ body {
 .wave-spinner > div {
   background-color: $green;
 }
+
+.mdl-layout__content {
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+   -webkit-flex-flow: column nowrap;
+   -ms-flex-flow: column nowrap;
+   flex-flow: column nowrap;
+}
+
+.mdl-layout__content > *:not(.mdl-layout-spacer) {
+  -webkit-flex: none;
+  -ms-flex: none;
+  flex: none;
+}
+
+.mdl-layout__header .mdl-layout__drawer-button {
+  color: $gray-dark;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 34px;
+}
+p {
+  font-size: 18px;
+  line-height: 28px;
+}
