@@ -16,8 +16,6 @@
   ],
   "dependencies": {
     "Snap.svg": "snap.svg#~0.4.1",
-    "ngSmoothScroll": "^2.0.0",
-    "angular-ui-router": "^0.2.18",
     "SpinKit": "spinkit#^1.2.5"
   }
 }

@@ -1,6 +1,4 @@
-
 $(function() {
-
   $("#wave-spinner").hide();
   $("#page").show();
 
@@ -311,7 +309,7 @@ $(function() {
 					hf.download = new Date().toISOString() + '.wav';
 					hf.innerHTML = hf.download;
 
-        	recordingslist.insertAdjacentHTML('afterend', '<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + hf.download + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
+        	recordingslist.insertAdjacentHTML('beforebegin', '<li class="mdl-list__item"><span class="mdl-list__item-primary-content" ><i class="material-icons mdl-list__item-icon">mic</i>' + hf.download + '</span><span class="mdl-list__item-secondary-action"><a class="mdl-button mdl-js-button mdl-button--accent" href="' + url + '"" download>Download <i class="material-icons">file_download</i></a></span></li>');
 				});
 			}
 
@@ -333,7 +331,6 @@ $(function() {
 					__log('No live audio input: ' + e);
 				});
 			};
-
 
       var sketch = function(noiseWave) {
 
