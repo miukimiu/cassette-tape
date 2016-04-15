@@ -9,8 +9,7 @@
 
  angular
   .module('cassetteApp', [
-    'ui.router',
-    'angular-spinkit'
+    'ui.router'
   ])
   .config(function($stateProvider, $urlRouterProvider) {
 
@@ -23,18 +22,4 @@
       templateUrl: 'views/partial-index.html',
       controller: 'CassetteController',
     });
-  })
-  .run(['$rootScope', '$state',function($rootScope, $state){
-
-    $rootScope.$on('$stateChangeStart',function(){
-        $rootScope.stateIsLoading = true;
-        console.log($rootScope.stateIsLoading);
-   });
-
-
-    $rootScope.$on('$stateChangeSuccess',function(){
-        $rootScope.stateIsLoading = false;
-        console.log($rootScope.stateIsLoading);
-   });
-
-  }]);
+  });
