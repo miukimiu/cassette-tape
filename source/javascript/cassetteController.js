@@ -312,25 +312,6 @@ angular.module('cassetteApp')
       });
     }
 
-    window.onload = function init() {
-      try {
-        // webkit shim
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia); //this will set navigator.getUserMedia to whatever it detects to be the proper prefixed version.
-        window.URL = window.URL || window.webkitURL;
-
-        audio_context = new AudioContext;
-        //console.log(('Audio context set up.');
-        //console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
-      } catch (e) {
-        __log('Just work on chrome!');
-      }
-
-      navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
-        __log('No live audio input: ' + e);
-      });
-    };
-
     var sketch = function(noiseWave) {
 
       var url,
@@ -400,5 +381,24 @@ angular.module('cassetteApp')
     };// var sketch
 
     var myP5 = new p5(sketch);
+
+    window.onload = function init() {
+      try {
+        // webkit shim
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia); //this will set navigator.getUserMedia to whatever it detects to be the proper prefixed version.
+        window.URL = window.URL || window.webkitURL;
+
+        audio_context = new AudioContext;
+        //console.log(('Audio context set up.');
+        //console.log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+      } catch (e) {
+        __log('Just work on chrome!');
+      }
+
+      navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+        __log('No live audio input: ' + e);
+      });
+    };
 
 });

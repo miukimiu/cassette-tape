@@ -22,4 +22,12 @@
       templateUrl: 'views/partial-index.html',
       controller: 'CassetteController',
     });
-  });
+  })
+  .run(['$rootScope', '$state',function($rootScope, $state){
+
+    $rootScope.$on('$stateChangeSuccess',function(){
+      console.log('rootScope yoo');
+      angular.element(document.querySelector('#wave-spinner')).remove();
+    });
+
+  }]);
