@@ -44,6 +44,15 @@ $(function() {
 
       pauseState.attr("display", "none");
 
+      $('.mdl-navigation a').click(function(){
+
+        $('.mdl-layout__content').stop().animate({
+            scrollTop: $( $(this).attr('href') ).offset().top - 160
+        }, 800);
+        return false;
+    	});
+
+
       // Audio Object
       audio.src = dir+playlist[0]+ext;
 
