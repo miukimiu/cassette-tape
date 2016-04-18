@@ -1,5 +1,5 @@
 $(function() {
-  $("#wave-spinner").hide();
+  $("#wave-spinner").fadeOut(1000);
   $("#page").fadeIn(2500);
 
   $("#button").click(function() {
