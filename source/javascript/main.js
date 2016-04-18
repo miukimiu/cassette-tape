@@ -1,6 +1,6 @@
 $(function() {
   $("#wave-spinner").hide();
-  $("#page").show();
+  $("#page").fadeIn(2500);
 
   $("#button").click(function() {
     $('html, body').animate({
@@ -42,16 +42,13 @@ $(function() {
       mic,
       soundFile;
 
-      $("a[href^='#']").click(function(event){
-
-          console.log($.attr(this, 'href'));
+      $("a[href^='#']").click(function(event) {
 
           $('html, body').animate({
               scrollTop: $( $.attr(this, 'href') ).offset().top
           }, 500);
           event.preventDefault();
       });
-
 
       pauseState.attr("display", "none");
 
@@ -260,9 +257,6 @@ $(function() {
       function startUserMedia(stream) {
 				var input = audio_context.createMediaStreamSource(stream);
 				__log('Media stream created.');
-				// Uncomment if you want the audio to feedback directly
-				//input.connect(audio_context.destination);
-				//__log('Input connected to audio context destination.');
 
 				recorder = new Recorder(input);
 				__log('Ready!');
