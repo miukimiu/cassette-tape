@@ -1,3 +1,4 @@
+OS       ?= $(shell uname -s)
 CC       ?= gcc
 CXX      ?= g++
 RM       ?= rm -f
@@ -5,6 +6,11 @@ CP       ?= cp -a
 MKDIR    ?= mkdir
 RMDIR    ?= rmdir
 WINDRES  ?= windres
+# Solaris/Illumos flavors
+# ginstall from coreutils
+ifeq ($(OS),SunOS)
+INSTALL  ?= ginstall
+endif
 INSTALL  ?= install
 CFLAGS   ?= -Wall
 CXXFLAGS ?= -Wall
@@ -20,14 +26,14 @@ CAT      ?= $(if $(filter $(OS),Windows_NT),type,cat)
 ifneq (,$(findstring /cygdrive/,$(PATH)))
 	UNAME := Cygwin
 else
-	ifneq (,$(findstring WINDOWS,$(PATH)))
+	ifneq (,$(findstring Windows_NT,$(OS)))
 		UNAME := Windows
 	else
 		ifneq (,$(findstring mingw32,$(MAKE)))
-			UNAME := MinGW
+			UNAME := Windows
 		else
 			ifneq (,$(findstring MINGW32,$(shell uname -s)))
-				UNAME = MinGW
+				UNAME = Windows
 			else
 				UNAME := $(shell uname -s)
 			endif
@@ -57,7 +63,7 @@ ifneq ($(LIBSASS_VERSION),)
 endif
 
 # enable mandatory flag
-ifeq (MinGW,$(UNAME))
+ifeq (Windows,$(UNAME))
 	ifneq ($(BUILD),shared)
 		STATIC_ALL     ?= 1
 	endif
@@ -117,7 +123,7 @@ ifeq ($(UNAME),Darwin)
 	LDFLAGS += -stdlib=libc++
 endif
 
-ifneq (MinGW,$(UNAME))
+ifneq (Windows,$(UNAME))
 	ifneq (FreeBSD,$(UNAME))
 		LDFLAGS += -ldl
 		LDLIBS += -ldl
@@ -128,13 +134,16 @@ ifneq ($(BUILD),shared)
 	BUILD = static
 endif
 
-ifeq (,$(PREFIX))
-	ifeq (,$(TRAVIS_BUILD_DIR))
-		PREFIX = /usr/local
+ifeq (,$(TRAVIS_BUILD_DIR))
+	ifeq ($(OS),SunOS)
+		PREFIX ?= /opt/local
 	else
-		PREFIX = $(TRAVIS_BUILD_DIR)
+		PREFIX ?= /usr/local
 	endif
+else
+	PREFIX ?= $(TRAVIS_BUILD_DIR)
 endif
+
 
 SASS_SASSC_PATH ?= sassc
 SASS_SPEC_PATH ?= sass-spec
@@ -145,7 +154,7 @@ RUBY_BIN = ruby
 LIB_STATIC = $(SASS_LIBSASS_PATH)/lib/libsass.a
 LIB_SHARED = $(SASS_LIBSASS_PATH)/lib/libsass.so
 
-ifeq (MinGW,$(UNAME))
+ifeq (Windows,$(UNAME))
 	ifeq (shared,$(BUILD))
 		CFLAGS     += -D ADD_EXPORTS
 		CXXFLAGS   += -D ADD_EXPORTS
@@ -159,9 +168,6 @@ else
 	endif
 endif
 
-ifeq (MinGW,$(UNAME))
-	SASSC_BIN = $(SASS_SASSC_PATH)/bin/sassc.exe
-endif
 ifeq (Windows,$(UNAME))
 	SASSC_BIN = $(SASS_SASSC_PATH)/bin/sassc.exe
 endif
@@ -171,7 +177,7 @@ include Makefile.conf
 RESOURCES =
 STATICLIB = lib/libsass.a
 SHAREDLIB = lib/libsass.so
-ifeq (MinGW,$(UNAME))
+ifeq (Windows,$(UNAME))
 	RESOURCES += res/resource.rc
 	SHAREDLIB  = lib/libsass.dll
 	ifeq (shared,$(BUILD))
@@ -294,13 +300,16 @@ version: $(SASSC_BIN)
 	$(SASSC_BIN) -v
 
 test: $(SASSC_BIN)
-	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -c $(SASSC_BIN) -s $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
+	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -V 3.4 -c $(SASSC_BIN) --impl libsass $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
 
 test_build: $(SASSC_BIN)
-	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -c $(SASSC_BIN) -s --ignore-todo $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
+	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -V 3.4 -c $(SASSC_BIN) --impl libsass $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
 
-test_issues: $(SASSC_BIN)
-	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -c $(SASSC_BIN) $(LOG_FLAGS) $(SASS_SPEC_PATH)/spec/issues
+test_full: $(SASSC_BIN)
+	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -V 3.4 -c $(SASSC_BIN) --impl libsass --run-todo $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
+
+test_probe: $(SASSC_BIN)
+	$(RUBY_BIN) $(SASS_SPEC_PATH)/sass-spec.rb -V 3.4 -c $(SASSC_BIN) --impl libsass --probe-todo $(LOG_FLAGS) $(SASS_SPEC_PATH)/$(SASS_SPEC_SPEC_DIR)
 
 clean-objects: lib
 	-$(RM) lib/*.a lib/*.so lib/*.dll lib/*.la

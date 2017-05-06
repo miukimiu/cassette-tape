@@ -1,3 +1,4 @@
+#include "sass.hpp"
 #include <cctype>
 #include <cstddef>
 #include <iostream>
@@ -14,6 +15,248 @@ namespace Sass {
 
   namespace Prelexer {
 
+
+    /*
+
+        def string_re(open, close)
+          /#{open}((?:\\.|\#(?!\{)|[^#{close}\\#])*)(#{close}|#\{)/m
+        end
+      end
+
+      # A hash of regular expressions that are used for tokenizing strings.
+      #
+      # The key is a `[Symbol, Boolean]` pair.
+      # The symbol represents which style of quotation to use,
+      # while the boolean represents whether or not the string
+      # is following an interpolated segment.
+      STRING_REGULAR_EXPRESSIONS = {
+        :double => {
+          /#{open}((?:\\.|\#(?!\{)|[^#{close}\\#])*)(#{close}|#\{)/m
+          false => string_re('"', '"'),
+          true => string_re('', '"')
+        },
+        :single => {
+          false => string_re("'", "'"),
+          true => string_re('', "'")
+        },
+        :uri => {
+          false => /url\(#{W}(#{URLCHAR}*?)(#{W}\)|#\{)/,
+          true => /(#{URLCHAR}*?)(#{W}\)|#\{)/
+        },
+        # Defined in https://developer.mozilla.org/en/CSS/@-moz-document as a
+        # non-standard version of http://www.w3.org/TR/css3-conditional/
+        :url_prefix => {
+          false => /url-prefix\(#{W}(#{URLCHAR}*?)(#{W}\)|#\{)/,
+          true => /(#{URLCHAR}*?)(#{W}\)|#\{)/
+        },
+        :domain => {
+          false => /domain\(#{W}(#{URLCHAR}*?)(#{W}\)|#\{)/,
+          true => /(#{URLCHAR}*?)(#{W}\)|#\{)/
+        }
+      }
+    */
+
+    /*
+      /#{open}
+        (
+          \\.
+          |
+          \# (?!\{)
+          |
+          [^#{close}\\#]
+        )*
+        (#{close}|#\{)
+      /m
+      false => string_re('"', '"'),
+      true => string_re('', '"')
+    */
+    extern const char string_double_negates[] = "\"\\#";
+    const char* re_string_double_close(const char* src)
+    {
+      return sequence <
+        // valid chars
+        zero_plus <
+          alternatives <
+            // escaped char
+            sequence <
+              exactly <'\\'>,
+              any_char
+            >,
+            // non interpolate hash
+            sequence <
+              exactly <'#'>,
+              negate <
+                exactly <'{'>
+              >
+            >,
+            // other valid chars
+            neg_class_char <
+              string_double_negates
+            >
+          >
+        >,
+        // quoted string closer
+        // or interpolate opening
+        alternatives <
+          exactly <'"'>,
+          lookahead < exactly< hash_lbrace > >
+        >
+      >(src);
+    }
+
+    const char* re_string_double_open(const char* src)
+    {
+      return sequence <
+        // quoted string opener
+        exactly <'"'>,
+        // valid chars
+        zero_plus <
+          alternatives <
+            // escaped char
+            sequence <
+              exactly <'\\'>,
+              any_char
+            >,
+            // non interpolate hash
+            sequence <
+              exactly <'#'>,
+              negate <
+                exactly <'{'>
+              >
+            >,
+            // other valid chars
+            neg_class_char <
+              string_double_negates
+            >
+          >
+        >,
+        // quoted string closer
+        // or interpolate opening
+        alternatives <
+          exactly <'"'>,
+          lookahead < exactly< hash_lbrace > >
+        >
+      >(src);
+    }
+
+    extern const char string_single_negates[] = "'\\#";
+    const char* re_string_single_close(const char* src)
+    {
+      return sequence <
+        // valid chars
+        zero_plus <
+          alternatives <
+            // escaped char
+            sequence <
+              exactly <'\\'>,
+              any_char
+            >,
+            // non interpolate hash
+            sequence <
+              exactly <'#'>,
+              negate <
+                exactly <'{'>
+              >
+            >,
+            // other valid chars
+            neg_class_char <
+              string_single_negates
+            >
+          >
+        >,
+        // quoted string closer
+        // or interpolate opening
+        alternatives <
+          exactly <'\''>,
+          lookahead < exactly< hash_lbrace > >
+        >
+      >(src);
+    }
+
+    const char* re_string_single_open(const char* src)
+    {
+      return sequence <
+        // quoted string opener
+        exactly <'\''>,
+        // valid chars
+        zero_plus <
+          alternatives <
+            // escaped char
+            sequence <
+              exactly <'\\'>,
+              any_char
+            >,
+            // non interpolate hash
+            sequence <
+              exactly <'#'>,
+              negate <
+                exactly <'{'>
+              >
+            >,
+            // other valid chars
+            neg_class_char <
+              string_single_negates
+            >
+          >
+        >,
+        // quoted string closer
+        // or interpolate opening
+        alternatives <
+          exactly <'\''>,
+          lookahead < exactly< hash_lbrace > >
+        >
+      >(src);
+    }
+
+    /*
+      :uri => {
+        false => /url\(#{W}(#{URLCHAR}*?)(#{W}\)|#\{)/,
+        true => /(#{URLCHAR}*?)(#{W}\)|#\{)/
+      },
+    */
+    const char* re_string_uri_close(const char* src)
+    {
+      return sequence <
+        non_greedy<
+          alternatives<
+            class_char< real_uri_chars >,
+            uri_character,
+            NONASCII,
+            ESCAPE
+          >,
+          alternatives<
+            sequence < optional < W >, exactly <')'> >,
+            lookahead < exactly< hash_lbrace > >
+          >
+        >,
+        optional <
+          sequence < optional < W >, exactly <')'> >
+        >
+      >(src);
+    }
+
+    const char* re_string_uri_open(const char* src)
+    {
+      return sequence <
+        exactly <'u'>,
+        exactly <'r'>,
+        exactly <'l'>,
+        exactly <'('>,
+        W,
+        non_greedy<
+          alternatives<
+            class_char< real_uri_chars >,
+            uri_character,
+            NONASCII,
+            ESCAPE
+          >,
+          alternatives<
+            sequence < W, exactly <')'> >,
+            exactly< hash_lbrace >
+          >
+        >
+      >(src);
+    }
 
     // Match a line comment (/.*?(?=\n|\r\n?|\Z)/.
     const char* line_comment(const char* src)
@@ -153,8 +396,8 @@ namespace Sass {
              >(src);
     }
 
-    // Match CSS unit identifier.
-    const char* unit_identifier(const char* src)
+    // Match a single CSS unit
+    const char* one_unit(const char* src)
     {
       return sequence <
                optional < exactly <'-'> >,
@@ -167,6 +410,34 @@ namespace Sass {
                  >
                > >
              >(src);
+    }
+
+    // Match numerator/denominator CSS units
+    const char* multiple_units(const char* src)
+    {
+      return
+        sequence <
+          one_unit,
+          zero_plus <
+            sequence <
+              exactly <'*'>,
+              one_unit
+            >
+          >
+        >(src);
+    }
+
+    // Match complex CSS unit identifiers
+    const char* unit_identifier(const char* src)
+    {
+      return sequence <
+        multiple_units,
+        optional <
+          sequence <
+          exactly <'/'>,
+          multiple_units
+        > >
+      >(src);
     }
 
     const char* identifier_alnums(const char* src)
@@ -194,7 +465,12 @@ namespace Sass {
                  sequence <
                    zero_plus <
                      alternatives <
-                       identifier,
+                       sequence <
+                         optional <
+                           exactly <'$'>
+                         >,
+                         identifier
+                       >,
                        exactly <'-'>
                      >
                    >,
@@ -202,9 +478,13 @@ namespace Sass {
                    zero_plus <
                      alternatives <
                        digits,
-                       identifier,
+                       sequence <
+                         optional <
+                           exactly <'$'>
+                         >,
+                         identifier
+                       >,
                        quoted_string,
-                       exactly<'+'>,
                        exactly<'-'>
                      >
                    >
@@ -278,22 +558,185 @@ namespace Sass {
       >(src);
     }
 
-    const char* value_schema(const char* src) {
-      // follows this pattern: ([xyz]*i[xyz]*)+
-      return one_plus< sequence< zero_plus< alternatives< identifier, percentage, dimension, hex, number, quoted_string > >,
-                                 interpolant,
-                                 zero_plus< alternatives< identifier, percentage, dimension, hex, number, quoted_string, exactly<'%'> > > > >(src);
+    const char* sass_value(const char* src) {
+      return alternatives <
+        quoted_string,
+        identifier,
+        percentage,
+        hex,
+        dimension,
+        number
+      >(src);
     }
 
-    /* not used anymore - remove?
-    const char* filename(const char* src) {
-      return one_plus< alternatives< identifier, number, exactly<'.'> > >(src);
+    // this is basically `one_plus < sass_value >`
+    // takes care to not parse invalid combinations
+    const char* value_combinations(const char* src) {
+      // `2px-2px` is invalid combo
+      bool was_number = false;
+      const char* pos = src;
+      while (src) {
+        if ((pos = alternatives < quoted_string, identifier, percentage, hex >(src))) {
+          was_number = false;
+          src = pos;
+        } else if (!was_number && !exactly<'+'>(src) && (pos = alternatives < dimension, number >(src))) {
+          was_number = true;
+          src = pos;
+        } else {
+          break;
+        }
+      }
+      return src;
     }
-    */
+
+    // must be at least one interpolant
+    // can be surrounded by sass values
+    // make sure to never parse (dim)(dim)
+    // since this wrongly consumes `2px-1px`
+    // `2px1px` is valid number (unit `px1px`)
+    const char* value_schema(const char* src)
+    {
+      return sequence <
+        one_plus <
+          sequence <
+            optional < value_combinations >,
+            interpolant,
+            optional < value_combinations >
+          >
+        >
+      >(src);
+    }
 
     // Match CSS '@' keywords.
     const char* at_keyword(const char* src) {
       return sequence<exactly<'@'>, identifier>(src);
+    }
+
+    /*
+        tok(%r{
+          (
+            \\.
+          |
+            (?!url\()
+            [^"'/\#!;\{\}] # "
+          |
+            /(?![\*\/])
+          |
+            \#(?!\{)
+          |
+            !(?![a-z]) # TODO: never consume "!" when issue 1126 is fixed.
+          )+
+        }xi) || tok(COMMENT) || tok(SINGLE_LINE_COMMENT) || interp_string || interp_uri ||
+                interpolation(:warn_for_color)
+    */
+    const char* re_almost_any_value_token(const char* src) {
+
+      return alternatives <
+        one_plus <
+          alternatives <
+            sequence <
+              exactly <'\\'>,
+              any_char
+            >,
+            sequence <
+              negate <
+                sequence <
+                  exactly < url_kwd >,
+                  exactly <'('>
+                >
+              >,
+              neg_class_char <
+                almost_any_value_class
+              >
+            >,
+            sequence <
+              exactly <'/'>,
+              negate <
+                alternatives <
+                  exactly <'/'>,
+                  exactly <'*'>
+                >
+              >
+            >,
+            sequence <
+              exactly <'\\'>,
+              exactly <'#'>,
+              negate <
+                exactly <'{'>
+              >
+            >,
+            sequence <
+              exactly <'!'>,
+              negate <
+                alpha
+              >
+            >
+          >
+        >,
+        block_comment,
+        line_comment,
+        interpolant,
+        space,
+        sequence <
+          exactly<'u'>,
+          exactly<'r'>,
+          exactly<'l'>,
+          exactly<'('>,
+          zero_plus <
+            alternatives <
+              class_char< real_uri_chars >,
+              uri_character,
+              NONASCII,
+              ESCAPE
+            >
+          >,
+          // false => /url\(#{W}(#{URLCHAR}*?)(#{W}\)|#\{)/,
+          // true => /(#{URLCHAR}*?)(#{W}\)|#\{)/
+          exactly<')'>
+        >
+      >(src);
+    }
+
+    /*
+      DIRECTIVES = Set[:mixin, :include, :function, :return, :debug, :warn, :for,
+        :each, :while, :if, :else, :extend, :import, :media, :charset, :content,
+        :_moz_document, :at_root, :error]
+    */
+    const char* re_special_directive(const char* src) {
+      return alternatives <
+        word < mixin_kwd >,
+        word < include_kwd >,
+        word < function_kwd >,
+        word < return_kwd >,
+        word < debug_kwd >,
+        word < warn_kwd >,
+        word < for_kwd >,
+        word < each_kwd >,
+        word < while_kwd >,
+        word < if_kwd >,
+        word < else_kwd >,
+        word < extend_kwd >,
+        word < import_kwd >,
+        word < media_kwd >,
+        word < charset_kwd >,
+        word < content_kwd >,
+        // exactly < moz_document_kwd >,
+        word < at_root_kwd >,
+        word < error_kwd >
+      >(src);
+    }
+
+    const char* re_prefixed_directive(const char* src) {
+      return sequence <
+        optional <
+          sequence <
+            exactly <'-'>,
+            one_plus < alnum >,
+            exactly <'-'>
+          >
+        >,
+        exactly < supports_kwd >
+      >(src);
     }
 
     const char* re_reference_combinator(const char* src) {
@@ -434,7 +877,7 @@ namespace Sass {
       return one_plus< alternatives< alnum,
                                      exactly<'-'>,
                                      exactly<'_'>,
-                                     exactly<'\\'> > >(src);
+                                     escape_seq > >(src);
     }
 
     const char* kwd_warn(const char* src) {
@@ -512,7 +955,7 @@ namespace Sass {
     }
 
     const char* hyphens_and_identifier(const char* src) {
-      return sequence< zero_plus< exactly< '-' > >, identifier >(src);
+      return sequence< zero_plus< exactly< '-' > >, identifier_alnums >(src);
     }
     const char* hyphens_and_name(const char* src) {
       return sequence< zero_plus< exactly< '-' > >, name >(src);
@@ -522,11 +965,11 @@ namespace Sass {
     }
     // Match CSS id names.
     const char* id_name(const char* src) {
-      return sequence<exactly<'#'>, name>(src);
+      return sequence<exactly<'#'>, identifier_alnums >(src);
     }
     // Match CSS class names.
     const char* class_name(const char* src) {
-      return sequence<exactly<'.'>, identifier>(src);
+      return sequence<exactly<'.'>, identifier >(src);
     }
     // Attribute name in an attribute selector.
     const char* attribute_name(const char* src) {
@@ -535,10 +978,13 @@ namespace Sass {
     }
     // match placeholder selectors
     const char* placeholder(const char* src) {
-      return sequence<exactly<'%'>, identifier>(src);
+      return sequence<exactly<'%'>, identifier_alnums >(src);
     }
     // Match CSS numeric constants.
 
+    const char* op(const char* src) {
+      return class_char<op_chars>(src);
+    }
     const char* sign(const char* src) {
       return class_char<sign_chars>(src);
     }
@@ -603,23 +1049,19 @@ namespace Sass {
     // Match CSS uri specifiers.
 
     const char* uri_prefix(const char* src) {
-      return exactly<url_kwd>(src);
-    }
-    const char* uri_value(const char* src)
-    {
-      return
-      sequence <
-        negate <
-          exactly < '$' >
+      return sequence <
+        exactly <
+          url_kwd
         >,
         zero_plus <
-          alternatives <
-            alnum,
-            interpolant,
-            exactly <'/'>,
-            class_char < uri_chars >
+          sequence <
+            exactly <'-'>,
+            one_plus <
+              alpha
+            >
           >
-        >
+        >,
+        exactly <'('>
       >(src);
     }
 
@@ -750,6 +1192,22 @@ namespace Sass {
     // Match SCSS variable names.
     const char* variable(const char* src) {
       return sequence<exactly<'$'>, identifier>(src);
+    }
+
+    // parse `calc`, `-a-calc` and `--b-c-calc`
+    // but do not parse `foocalc` or `foo-calc`
+    const char* calc_fn_call(const char* src) {
+      return sequence <
+        optional < sequence <
+          hyphens,
+          one_plus < sequence <
+            strict_identifier,
+            hyphens
+          > >
+        > >,
+        exactly < calc_fn_kwd >,
+        word_boundary
+      >(src);
     }
 
     // Match Sass boolean keywords.
@@ -1094,6 +1552,83 @@ namespace Sass {
       >(src);
     }
 
+    const char* re_selector_list(const char* src) {
+      return alternatives <
+        // partial bem selector
+        sequence <
+          ampersand,
+          one_plus <
+            exactly < '-' >
+          >,
+          word_boundary,
+          optional_spaces
+        >,
+        // main selector matching
+        one_plus <
+          alternatives <
+            // consume whitespace and comments
+            spaces, block_comment, line_comment,
+            // match `/deep/` selector (pass-trough)
+            // there is no functionality for it yet
+            schema_reference_combinator,
+            // match selector ops /[*&%,\[\]]/
+            class_char < selector_lookahead_ops >,
+            // match selector combinators /[>+~]/
+            class_char < selector_combinator_ops >,
+            // match attribute compare operators
+            sequence <
+              exactly <'('>,
+              optional_spaces,
+              optional <re_selector_list>,
+              optional_spaces,
+              exactly <')'>
+            >,
+            alternatives <
+              exact_match, class_match, dash_match,
+              prefix_match, suffix_match, substring_match
+            >,
+            // main selector match
+            sequence <
+              // allow namespace prefix
+              optional < namespace_schema >,
+              // modifiers prefixes
+              alternatives <
+                sequence <
+                  exactly <'#'>,
+                  // not for interpolation
+                  negate < exactly <'{'> >
+                >,
+                // class match
+                exactly <'.'>,
+                // single or double colon
+                optional < pseudo_prefix >
+              >,
+              // accept hypens in token
+              one_plus < sequence <
+                // can start with hyphens
+                zero_plus < exactly<'-'> >,
+                // now the main token
+                alternatives <
+                  kwd_optional,
+                  exactly <'*'>,
+                  quoted_string,
+                  interpolant,
+                  identifier,
+                  variable,
+                  percentage,
+                  binomial,
+                  dimension,
+                  alnum
+                >
+              > >,
+              // can also end with hyphens
+              zero_plus < exactly<'-'> >
+            >
+          >
+        >
+      >(src);
+    }
+
     const char* type_selector(const char* src) {
       return sequence< optional<namespace_schema>, identifier>(src);
     }
@@ -1107,34 +1642,44 @@ namespace Sass {
       return sequence< number, optional_spaces, exactly<'/'>, optional_spaces, number >(src);
     }
 
-    template <size_t size, prelexer mx, prelexer pad>
-    const char* padded_token(const char* src)
-    {
-      size_t got = 0;
-      const char* pos = src;
-      while (got < size) {
-        if (!mx(pos)) break;
-        ++ pos; ++ got;
-      }
-      while (got < size) {
-        if (!pad(pos)) break;
-        ++ pos; ++ got;
-      }
-      return got ? pos : 0;
-    }
+    // lexer special_fn: these functions cannot be overloaded
+    // (/((-[\w-]+-)?(calc|element)|expression|progid:[a-z\.]*)\(/i)
+    const char* re_special_fun(const char* src) {
 
-    template <size_t min, size_t max, prelexer mx>
-    const char* minmax_range(const char* src)
-    {
-      size_t got = 0;
-      const char* pos = src;
-      while (got < max) {
-        if (!mx(pos)) break;
-        ++ pos; ++ got;
+      // match this first as we test prefix hyphens
+      if (const char* calc = calc_fn_call(src)) {
+        return calc;
       }
-      if (got < min) return 0;
-      if (got > max) return 0;
-      return pos;
+
+      return sequence <
+        optional <
+          sequence <
+            exactly <'-'>,
+            one_plus <
+              alternatives <
+                alpha,
+                exactly <'+'>,
+                exactly <'-'>
+              >
+            >
+          >
+        >,
+        alternatives <
+          word < expression_kwd >,
+          sequence <
+            sequence <
+              exactly < progid_kwd >,
+              exactly <':'>
+            >,
+            zero_plus <
+              alternatives <
+                char_range <'a', 'z'>,
+                exactly <'.'>
+              >
+            >
+          >
+        >
+      >(src);
     }
 
   }

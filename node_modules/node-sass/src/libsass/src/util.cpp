@@ -1,3 +1,4 @@
+#include "sass.hpp"
 #include "sass.h"
 #include "ast.hpp"
 #include "util.hpp"
@@ -11,36 +12,15 @@
 
 namespace Sass {
 
-  #define out_of_memory() do {            \
-      std::cerr << "Out of memory.\n";    \
-      exit(EXIT_FAILURE);                 \
-    } while (0)
-
-  double round(double val)
+  double round(double val, size_t precision)
   {
+    // https://github.com/sass/sass/commit/4e3e1d5684cc29073a507578fc977434ff488c93
+    if (fmod(val, 1) - 0.5 > - std::pow(0.1, precision + 1)) return std::ceil(val);
+    else if (fmod(val, 1) - 0.5 > std::pow(0.1, precision)) return std::floor(val);
     // work around some compiler issue
     // cygwin has it not defined in std
     using namespace std;
-
-    // This was later repatched in 3.4.20
-    // which is as yet unreleased.
-    // https://github.com/sass/sass/commit/4e3e1d5684cc29073a507578fc977434ff488c93
-    if (fmod(val, 1) - 0.5 > -0.00001) return std::ceil(val);
     return ::round(val);
-
-    // Use this version once sass-spec is at 3.4.20
-    // if (fmod(val, 1) - 0.5 > -0.00001) return ::round(val);
-    // return value > 0 ? std::ceil(val) : std::floor(val);
-  }
-
-  /* Sadly, sass_strdup is not portable. */
-  char *sass_strdup(const char *str)
-  {
-    char *ret = (char*) malloc(strlen(str) + 1);
-    if (ret == NULL)
-      out_of_memory();
-    strcpy(ret, str);
-    return ret;
   }
 
   /* Locale unspecific atof function. */
@@ -55,7 +35,7 @@ namespace Sass {
       if(found != NULL){
         // substitution is required. perform the substitution on a copy
         // of the string. This is slower but it is thread safe.
-        char *copy = sass_strdup(str);
+        char *copy = sass_copy_c_string(str);
         *(copy + (found - str)) = separator;
         double res = atof(copy);
         free(copy);
@@ -104,94 +84,6 @@ namespace Sass {
     return *array = arr;
   }
 
-  std::string string_eval_escapes(const std::string& s)
-  {
-
-    std::string out("");
-    bool esc = false;
-    for (size_t i = 0, L = s.length(); i < L; ++i) {
-      if(s[i] == '\\' && esc == false) {
-        esc = true;
-
-        // escape length
-        size_t len = 1;
-
-        // parse as many sequence chars as possible
-        // ToDo: Check if ruby aborts after possible max
-        while (i + len < L && s[i + len] && isxdigit(s[i + len])) ++ len;
-
-        // hex string?
-        if (len > 1) {
-
-          // convert the extracted hex string to code point value
-          // ToDo: Maybe we could do this without creating a substring
-          uint32_t cp = strtol(s.substr (i + 1, len - 1).c_str(), NULL, 16);
-
-          if (cp == 0) cp = 0xFFFD;
-
-          // assert invalid code points
-          if (cp >= 1) {
-
-            // use a very simple approach to convert via utf8 lib
-            // maybe there is a more elegant way; maybe we shoud
-            // convert the whole output from string to a stream!?
-            // allocate memory for utf8 char and convert to utf8
-            unsigned char u[5] = {0,0,0,0,0}; utf8::append(cp, u);
-            for(size_t m = 0; u[m] && m < 5; m++) out.push_back(u[m]);
-
-            // skip some more chars?
-            i += len - 1; esc = false;
-            if (cp == 10) out += ' ';
-
-          }
-
-        }
-
-      }
-      else {
-        out += s[i];
-        esc = false;
-      }
-    }
-    return out;
-
-  }
-
-  // double escape every escape sequences
-  // escape unescaped quotes and backslashes
-  std::string string_escape(const std::string& str)
-  {
-    std::string out("");
-    for (auto i : str) {
-      // escape some characters
-      if (i == '"') out += '\\';
-      if (i == '\'') out += '\\';
-      if (i == '\\') out += '\\';
-      out += i;
-    }
-    return out;
-  }
-
-  // unescape every escape sequence
-  // only removes unescaped backslashes
-  std::string string_unescape(const std::string& str)
-  {
-    std::string out("");
-    bool esc = false;
-    for (auto i : str) {
-      if (esc || i != '\\') {
-        esc = false;
-        out += i;
-      } else {
-        esc = true;
-      }
-    }
-    // open escape sequence at end
-    // maybe it should thow an error
-    if (esc) { out += '\\'; }
-    return out;
-  }
-
   // read css string (handle multiline DELIM)
   std::string read_css_string(const std::string& str)
   {
@@ -211,29 +103,10 @@ namespace Sass {
       }
       out.push_back(i);
     }
-    if (esc) out += '\\';
-    return out;
-  }
-
-  // evacuate unescaped quoted
-  // leave everything else untouched
-  std::string evacuate_quotes(const std::string& str)
-  {
-    std::string out("");
-    bool esc = false;
-    for (auto i : str) {
-      if (!esc) {
-        // ignore next character
-        if (i == '\\') esc = true;
-        // evacuate unescaped quotes
-        else if (i == '"') out += '\\';
-        else if (i == '\'') out += '\\';
-      }
-      // get escaped char now
-      else { esc = false; }
-      // remove nothing
-      out += i;
-    }
+    // happens when parsing does not correctly skip
+    // over escaped sequences for ie. interpolations
+    // one example: foo\#{interpolate}
+    // if (esc) out += '\\';
     return out;
   }
 
@@ -319,38 +192,6 @@ namespace Sass {
     }
     if (has) return str;
     else return text;
-  }
-
-   std::string normalize_wspace(const std::string& str)
-  {
-    bool ws = false;
-    bool esc = false;
-    std::string text = "";
-    for(const char& i : str) {
-      if (!esc && i == '\\') {
-        esc = true;
-        ws = false;
-        text += i;
-      } else if (esc) {
-        esc = false;
-        ws = false;
-        text += i;
-      } else if (
-        i == ' ' ||
-        i == '\r' ||
-        i == '\n' ||
-        i == '	'
-      ) {
-        // only add one space
-        if (!ws) text += ' ';
-        ws = true;
-      } else {
-        ws = false;
-        text += i;
-      }
-    }
-    if (esc) text += '\\';
-    return text;
   }
 
   // find best quote_mark by detecting if the string contains any single
@@ -462,7 +303,7 @@ namespace Sass {
 
   }
 
-  std::string quote(const std::string& s, char q, bool keep_linefeed_whitespace)
+  std::string quote(const std::string& s, char q)
   {
 
     // autodetect with fallback to given quote
@@ -488,13 +329,27 @@ namespace Sass {
 
       int cp = utf8::next(it, end);
 
+      // in case of \r, check if the next in sequence
+      // is \n and then advance the iterator.
+      if (cp == '\r' && it < end && utf8::peek_next(it, end) == '\n') {
+        cp = utf8::next(it, end);
+      }
+
       if (cp == '\n') {
         quoted.push_back('\\');
         quoted.push_back('a');
         // we hope we can remove this flag once we figure out
         // why ruby sass has these different output behaviors
-        if (keep_linefeed_whitespace)
+        // gsub(/\n(?![a-fA-F0-9\s])/, "\\a").gsub("\n", "\\a ")
+        using namespace Prelexer;
+        if (alternatives <
+          Prelexer::char_range<'a', 'f'>,
+          Prelexer::char_range<'A', 'F'>,
+          Prelexer::char_range<'0', '9'>,
+          space
+        >(it) != NULL) {
           quoted.push_back(' ');
+        }
       } else if (cp < 127) {
         quoted.push_back((char) cp);
       } else {
@@ -606,7 +461,7 @@ namespace Sass {
       bool hasPrintableChildBlocks = false;
       for (size_t i = 0, L = b->length(); i < L; ++i) {
         Statement* stm = (*b)[i];
-        if (dynamic_cast<At_Rule*>(stm)) {
+        if (dynamic_cast<Directive*>(stm)) {
           return true;
         } else if (dynamic_cast<Has_Block*>(stm)) {
           Block* pChildBlock = ((Has_Block*)stm)->block();
@@ -615,7 +470,7 @@ namespace Sass {
           }
         } else if (Comment* c = dynamic_cast<Comment*>(stm)) {
           // keep for uncompressed
-          if (style != SASS_STYLE_COMPRESSED) {
+          if (style != COMPRESSED) {
             hasDeclarations = true;
           }
           // output style compressed
@@ -673,7 +528,7 @@ namespace Sass {
           // is NULL, then that means there was never a wrapping selector and it is printable (think of a top level media block with
           // a declaration in it).
         }
-        else if (typeid(*stm) == typeid(Declaration) || typeid(*stm) == typeid(At_Rule)) {
+        else if (typeid(*stm) == typeid(Declaration) || typeid(*stm) == typeid(Directive)) {
           hasDeclarations = true;
         }
         else if (dynamic_cast<Has_Block*>(stm)) {
@@ -698,14 +553,52 @@ namespace Sass {
       if (b == 0) return false;
       for (size_t i = 0, L = b->length(); i < L; ++i) {
         Statement* stm = (*b)[i];
-        if (typeid(*stm) == typeid(At_Rule)) return true;
-        if (typeid(*stm) == typeid(Declaration)) return true;
-        if (Has_Block* child = dynamic_cast<Has_Block*>(stm)) {
-          if (isPrintable(child->block(), style)) return true;
+        if (typeid(*stm) == typeid(Directive)) return true;
+        else if (typeid(*stm) == typeid(Declaration)) return true;
+        else if (typeid(*stm) == typeid(Comment)) {
+          Comment* c = (Comment*) stm;
+          if (isPrintable(c, style)) {
+            return true;
+          }
+        }
+        else if (typeid(*stm) == typeid(Ruleset)) {
+          Ruleset* r = (Ruleset*) stm;
+          if (isPrintable(r, style)) {
+            return true;
+          }
+        }
+        else if (typeid(*stm) == typeid(Supports_Block)) {
+          Supports_Block* f = (Supports_Block*) stm;
+          if (isPrintable(f, style)) {
+            return true;
+          }
+        }
+        else if (typeid(*stm) == typeid(Media_Block)) {
+          Media_Block* m = (Media_Block*) stm;
+          if (isPrintable(m, style)) {
+            return true;
+          }
+        }
+        else if (dynamic_cast<Has_Block*>(stm) && isPrintable(((Has_Block*)stm)->block(), style)) {
+          return true;
         }
       }
       return false;
     }
+
+    bool isPrintable(Comment* c, Sass_Output_Style style)
+    {
+      // keep for uncompressed
+      if (style != COMPRESSED) {
+        return true;
+      }
+      // output style compressed
+      if (c->is_important()) {
+        return true;
+      }
+      // not printable
+      return false;
+    };
 
     bool isPrintable(Block* b, Sass_Output_Style style) {
       if (b == NULL) {
@@ -714,17 +607,12 @@ namespace Sass {
 
       for (size_t i = 0, L = b->length(); i < L; ++i) {
         Statement* stm = (*b)[i];
-        if (typeid(*stm) == typeid(Declaration) || typeid(*stm) == typeid(At_Rule)) {
+        if (typeid(*stm) == typeid(Declaration) || typeid(*stm) == typeid(Directive)) {
           return true;
         }
         else if (typeid(*stm) == typeid(Comment)) {
           Comment* c = (Comment*) stm;
-          // keep for uncompressed
-          if (style != SASS_STYLE_COMPRESSED) {
-            return true;
-          }
-          // output style compressed
-          if (c->is_important()) {
+          if (isPrintable(c, style)) {
             return true;
           }
         }

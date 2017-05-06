@@ -1,3 +1,4 @@
+#include "sass.hpp"
 #include <cctype>
 #include <cstddef>
 #include <iostream>
@@ -90,7 +91,8 @@ namespace Sass {
     // valid in a uri (copied from Ruby Sass)
     bool is_uri_character(const char& chr)
     {
-      return unsigned(chr) > 41 && unsigned(chr) < 127;
+      return (unsigned(chr) > 41 && unsigned(chr) < 127) ||
+             unsigned(chr) == ':' || unsigned(chr) == '/';
     }
 
     // check if char is within a reduced ascii range
@@ -120,6 +122,7 @@ namespace Sass {
     const char* xdigit(const char* src) { return is_xdigit(*src) ? src + 1 : 0; }
     const char* alnum(const char* src) { return is_alnum(*src) ? src + 1 : 0; }
     const char* punct(const char* src) { return is_punct(*src) ? src + 1 : 0; }
+    const char* hyphen(const char* src) { return *src && *src == '-' ? src + 1 : 0; }
     const char* character(const char* src) { return is_character(*src) ? src + 1 : 0; }
     const char* uri_character(const char* src) { return is_uri_character(*src) ? src + 1 : 0; }
     const char* escapable_character(const char* src) { return is_escapable_character(*src) ? src + 1 : 0; }
@@ -127,6 +130,7 @@ namespace Sass {
     // Match multiple ctype characters.
     const char* spaces(const char* src) { return one_plus<space>(src); }
     const char* digits(const char* src) { return one_plus<digit>(src); }
+    const char* hyphens(const char* src) { return one_plus<hyphen>(src); }
 
     // Whitespace handling.
     const char* no_spaces(const char* src) { return negate< space >(src); }
@@ -136,7 +140,7 @@ namespace Sass {
     const char* any_char(const char* src) { return *src ? src + 1 : src; }
 
     // Match word boundary (zero-width lookahead).
-    const char* word_boundary(const char* src) { return is_character(*src) ? 0 : src; }
+    const char* word_boundary(const char* src) { return is_character(*src) || *src == '#' ? 0 : src; }
 
     // Match linefeed /(?:\n|\r\n?)/
     const char* re_linebreak(const char* src)

@@ -1,4 +1,4 @@
-os: Visual Studio 2015
+os: Visual Studio 2013
 
 environment:
   CTEST_OUTPUT_ON_FAILURE: 1
@@ -27,9 +27,7 @@ install:
       if ($env:Compiler -eq "mingw" -AND -Not (Test-Path "C:\mingw64")) {
         # Install MinGW.
         $file = "x86_64-4.9.2-release-win32-seh-rt_v4-rev3.7z"
-        $url  = "https://bintray.com/artifact/download/drewwells/generic/"
-        $url += $file
-        Invoke-WebRequest -UserAgent wget -Uri $url -OutFile $file
+        wget https://bintray.com/artifact/download/drewwells/generic/$file -OutFile $file
         &7z x -oC:\ $file > $null
       }
   - set PATH=C:\mingw64\bin;%PATH%
@@ -53,18 +51,32 @@ build_script:
 
 test_script:
   - ps: |
-      $PRNR = [System.Environment]::ExpandEnvironmentVariables("%APPVEYOR_PULL_REQUEST_NUMBER%")
-      if ($PRNR -ne "") {
+      $PRNR = $env:APPVEYOR_PULL_REQUEST_NUMBER
+      if ($PRNR) {
         echo "Fetching info for PR $PRNR"
-        $request = (New-Object System.Net.WebClient)
-        $request.headers['User-Agent'] = "Mozilla/5.0"
-        $request.DownloadFile( "https://api.github.com/repos/sass/libsass/pulls/$PRNR", 'pr.json')
-        $json = [IO.File]::ReadAllText('pr.json')
+        wget https://api.github.com/repos/sass/libsass/pulls/$PRNR -OutFile pr.json
+        $json = cat pr.json -Raw
         $SPEC_PR = [regex]::match($json,'sass\/sass-spec(#|\/pull\/)([0-9]+)').Groups[2].Value
-        if ($SPEC_PR -ne "") {
+        if ($SPEC_PR) {
           echo "Checkout sass spec PR $SPEC_PR"
           git -C sass-spec fetch -q -u origin pull/$SPEC_PR/head:ci-spec-pr-$SPEC_PR
           git -C sass-spec checkout -q --force ci-spec-pr-$SPEC_PR
         }
       }
-      ruby sass-spec/sass-spec.rb -c $env:TargetPath -s --ignore-todo sass-spec/spec
+      ruby sass-spec/sass-spec.rb -V 3.4 --probe-todo --impl libsass -c $env:TargetPath -s sass-spec/spec
+      if(-not($?)) {
+        echo "sass-spec tests failed"
+        exit 1
+      }
+      Write-Host "Explicitly testing the case when cwd has Cyrillic characters: " -nonewline
+      # See comments in gh-1774 for details.
+      $env:TargetPath =  Join-Path $pwd.Path $env:TargetPath
+      cd sass-spec/spec/libsass/Sáss-UŢF8/
+      &$env:TargetPath ./input.scss 2>&1>$null
+      if(-not($?)) {
+        echo "Failed!"
+        exit 1
+      } else {
+        echo "Success!"
+      }
+

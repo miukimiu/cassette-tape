@@ -2,7 +2,7 @@
 
 var gutil = require('gulp-util');
 var through = require('through2');
-var assign = require('object-assign');
+var clonedeep = require('lodash.clonedeep');
 var path = require('path');
 var applySourceMap = require('vinyl-sourcemaps-apply');
 
@@ -34,8 +34,11 @@ var gulpSass = function gulpSass(options, sync) {
     }
 
 
-    opts = assign({}, options);
+    opts = clonedeep(options || {});
     opts.data = file.contents.toString();
+
+    // we set the file path here so that libsass can correctly resolve import paths
+    opts.file = file.path;
 
     // Ensure `indentedSyntax` is true if a `.sass` file
     if (path.extname(file.path) === '.sass') {
@@ -76,21 +79,26 @@ var gulpSass = function gulpSass(options, sync) {
         // Transform map into JSON
         sassMap = JSON.parse(sassObj.map.toString());
         // Grab the stdout and transform it into stdin
-        sassMapFile = sassMap.file.replace('stdout', 'stdin');
+        sassMapFile = sassMap.file.replace(/^stdout$/, 'stdin');
         // Grab the base file name that's being worked on
         sassFileSrc = file.relative;
         // Grab the path portion of the file that's being worked on
         sassFileSrcPath = path.dirname(sassFileSrc);
         if (sassFileSrcPath) {
           //Prepend the path to all files in the sources array except the file that's being worked on
-          for (sourceFileIndex = 0; sourceFileIndex < sassMap.sources.length; sourceFileIndex++) {
-            if (sourceFileIndex !== sassMap.sources.indexOf(sassMapFile)) {
-              sassMap.sources[sourceFileIndex] = path.join(sassFileSrcPath, sassMap.sources[sourceFileIndex]);
-            }
-          }
+          sourceFileIndex = sassMap.sources.indexOf(sassMapFile);
+          sassMap.sources = sassMap.sources.map(function(source, index) {
+            return (index === sourceFileIndex) ? source : path.join(sassFileSrcPath, source);
+          });
         }
-        // Replace the stdin with the original file name
-        sassMap.sources[sassMap.sources.indexOf(sassMapFile)] = sassFileSrc;
+
+        // Remove 'stdin' from souces and replace with filenames!
+        sassMap.sources = sassMap.sources.filter(function(src) {
+          if (src !== 'stdin') {
+            return src;
+          }
+        });
+
         // Replace the map file with the original file name (but new extension)
         sassMap.file = gutil.replaceExtension(sassFileSrc, '.css');
         // Apply the map
@@ -118,7 +126,10 @@ var gulpSass = function gulpSass(options, sync) {
       message += error.formatted;
 
       error.messageFormatted = message;
+      error.messageOriginal = error.message;
       error.message = gutil.colors.stripColor(message);
+
+      error.relativePath = relativePath;
 
       return cb(new gutil.PluginError(
           PLUGIN_NAME, error

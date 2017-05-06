@@ -23,11 +23,11 @@ namespace Sass {
   class Parser : public ParserState {
   public:
 
-    enum Syntactic_Context { nothing, mixin_def, function_def };
+    enum Scope { Root, Mixin, Function, Media, Control, Properties, Rules };
 
     Context& ctx;
     std::vector<Block*> block_stack;
-    std::vector<Syntactic_Context> stack;
+    std::vector<Scope> stack;
     Media_Block* last_media_block;
     const char* source;
     const char* position;
@@ -44,14 +44,14 @@ namespace Sass {
     Parser(Context& ctx, const ParserState& pstate)
     : ParserState(pstate), ctx(ctx), block_stack(0), stack(0), last_media_block(0),
       source(0), position(0), end(0), before_token(pstate), after_token(pstate), pstate(pstate), indentation(0)
-    { in_at_root = false; stack.push_back(nothing); }
+    { in_at_root = false; stack.push_back(Scope::Root); }
 
     // static Parser from_string(const std::string& src, Context& ctx, ParserState pstate = ParserState("[STRING]"));
-    static Parser from_c_str(const char* src, Context& ctx, ParserState pstate = ParserState("[CSTRING]"));
-    static Parser from_c_str(const char* beg, const char* end, Context& ctx, ParserState pstate = ParserState("[CSTRING]"));
-    static Parser from_token(Token t, Context& ctx, ParserState pstate = ParserState("[TOKEN]"));
+    static Parser from_c_str(const char* src, Context& ctx, ParserState pstate = ParserState("[CSTRING]"), const char* source = 0);
+    static Parser from_c_str(const char* beg, const char* end, Context& ctx, ParserState pstate = ParserState("[CSTRING]"), const char* source = 0);
+    static Parser from_token(Token t, Context& ctx, ParserState pstate = ParserState("[TOKEN]"), const char* source = 0);
     // special static parsers to convert strings into certain selectors
-    static Selector_List* parse_selector(const char* src, Context& ctx, ParserState pstate = ParserState("[SELECTOR]"));
+    static Selector_List* parse_selector(const char* src, Context& ctx, ParserState pstate = ParserState("[SELECTOR]"), const char* source = 0);
 
 #ifdef __clang__
 
@@ -99,6 +99,15 @@ namespace Sass {
     // peek will only skip over space, tabs and line comment
     // return the position where the lexer match will occur
     template <Prelexer::prelexer mx>
+    const char* match(const char* start = 0)
+    {
+      // match the given prelexer
+      return mx(position);
+    }
+
+    // peek will only skip over space, tabs and line comment
+    // return the position where the lexer match will occur
+    template <Prelexer::prelexer mx>
     const char* peek(const char* start = 0)
     {
 
@@ -107,7 +116,10 @@ namespace Sass {
       const char* it_before_token = sneak < mx >(start);
 
       // match the given prelexer
-      return mx(it_before_token);
+      const char* match = mx(it_before_token);
+
+      // check if match is in valid range
+      return match <= end ? match : 0;
 
     }
 
@@ -121,6 +133,8 @@ namespace Sass {
     const char* lex(bool lazy = true, bool force = false)
     {
 
+      if (*position == 0) return 0;
+
       // position considered before lexed token
       // we can skip whitespace or comments for
       // lazy developers (but we need control)
@@ -132,6 +146,9 @@ namespace Sass {
 
       // now call matcher to get position after token
       const char* it_after_token = mx(it_before_token);
+
+      // check if match is in valid range
+      if (it_after_token > end) return 0;
 
       // maybe we want to update the parser state anyway?
       if (force == false) {
@@ -253,6 +270,7 @@ namespace Sass {
     Function_Call* parse_function_call();
     Function_Call_Schema* parse_function_call_schema();
     String* parse_url_function_string();
+    String* parse_url_function_argument();
     String* parse_interpolated_chunk(Token, bool constant = false);
     String* parse_string();
     String_Constant* parse_static_expression();
@@ -282,11 +300,21 @@ namespace Sass {
     Supports_Condition* parse_supports_declaration();
     Supports_Condition* parse_supports_condition_in_parens();
     At_Root_Block* parse_at_root_block();
-    At_Root_Expression* parse_at_root_expression();
-    At_Rule* parse_at_rule();
+    At_Root_Query* parse_at_root_query();
+    String_Schema* parse_almost_any_value();
+    Directive* parse_special_directive();
+    Directive* parse_prefixed_directive();
+    Directive* parse_directive();
     Warning* parse_warning();
     Error* parse_error();
     Debug* parse_debug();
+
+    // be more like ruby sass
+    Expression* lex_almost_any_value_token();
+    Expression* lex_almost_any_value_chars();
+    Expression* lex_interp_string();
+    Expression* lex_interp_uri();
+    Expression* lex_interpolation();
 
     // these will throw errors
     Token lex_variable();
@@ -298,11 +326,39 @@ namespace Sass {
     Lookahead lookahead_for_selector(const char* start = 0);
     Lookahead lookahead_for_include(const char* start = 0);
 
-    Expression* fold_operands(Expression* base, std::vector<Expression*>& operands, Sass_OP op);
-    Expression* fold_operands(Expression* base, std::vector<Expression*>& operands, std::vector<Sass_OP>& ops);
+    Expression* fold_operands(Expression* base, std::vector<Expression*>& operands, Operand op);
+    Expression* fold_operands(Expression* base, std::vector<Expression*>& operands, std::vector<Operand>& ops, size_t i = 0);
 
     void throw_syntax_error(std::string message, size_t ln = 0);
     void throw_read_error(std::string message, size_t ln = 0);
+
+
+    template <Prelexer::prelexer open, Prelexer::prelexer close>
+    Expression* lex_interp()
+    {
+      if (lex < open >(false)) {
+        String_Schema* schema = SASS_MEMORY_NEW(ctx.mem, String_Schema, pstate);
+        // std::cerr << "LEX [[" << std::string(lexed) << "]]\n";
+        *schema << SASS_MEMORY_NEW(ctx.mem, String_Constant, pstate, lexed);
+        if (position[0] == '#' && position[1] == '{') {
+          Expression* itpl = lex_interpolation();
+          if (itpl) *schema << itpl;
+          while (lex < close >(false)) {
+            // std::cerr << "LEX [[" << std::string(lexed) << "]]\n";
+            *schema << SASS_MEMORY_NEW(ctx.mem, String_Constant, pstate, lexed);
+            if (position[0] == '#' && position[1] == '{') {
+              Expression* itpl = lex_interpolation();
+              if (itpl) *schema << itpl;
+            } else {
+              return schema;
+            }
+          }
+        } else {
+          return SASS_MEMORY_NEW(ctx.mem, String_Constant, pstate, lexed);
+        }
+      }
+      return 0;
+    }
   };
 
   size_t check_bom_chars(const char* src, const char *end, const unsigned char* bom, size_t len);
