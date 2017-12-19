@@ -92,7 +92,7 @@ $(function() {
         );
     }
 
-    // wheel animation left
+    // tape animation left
     function tapeAnimationL() {
         tapeL.animate({
                 cx: '90.3893'
@@ -105,7 +105,7 @@ $(function() {
             }
         );
     }
-    // wheel animation right
+    // tape animation right
     function tapeAnimationR() {
         tapeR.animate({
                 cx: '330.389'
