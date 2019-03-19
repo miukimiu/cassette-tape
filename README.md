@@ -1,6 +1,6 @@
 # Cassette Tape
 
-Cassette Tape lets you record you freestyle in the browser. You just need to press play to listen to the hiphop loop and when you feel ready just press rec and it starts recording your voice. After that a wav file with your freestyle is generated and you can save on your computer.
+Cassette Tape lets you record your freestyle in the browser. You just need to press play to listen to the hiphop loop and when you feel ready just press rec and it starts recording your voice. After that a wav file with your freestyle is generated and you can save on your computer.
 
 This is a Chrome Experiment. It was developed to work only in this browser. It uses some technologies not yet fully supported by all browsers.
 
